@@ -13,8 +13,9 @@ const MyDrawer = () => {
         headerShown: false,
         drawerType: Dimensions.width >= 768 ? 'permanent' : 'front',
         drawerItemStyle: {display: 'none'},
+
         drawerStyle: {
-          width: Dimensions.width >= 768 ? '25%' : '75%',
+          width: Dimensions.width >= 768 ? '25%' : '95%',
           backgroundColor: '#fff',
         },
       }}

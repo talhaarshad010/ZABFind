@@ -6,12 +6,16 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Modal,
+  Pressable,
 } from 'react-native';
 import React, {useState} from 'react';
 import MyHeader from '../components/Header';
 import WrapperContainer from '../components/WrapperContainer';
 import Colors from '../styles/Colors';
 import MyText from '../components/textcomponent';
+import Icon from 'react-native-vector-icons/Ionicons';
+import UploadIcon from 'react-native-vector-icons/Feather';
 import {
   responsiveWidth,
   responsiveHeight,
@@ -20,7 +24,8 @@ import {
 import MyTextInput from '../components/TextInputComponent';
 import TextInputDropdown from '../components/Dropdown';
 import MyButton from '../components/CustomButton';
-import {launchImageLibrary} from 'react-native-image-picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {useNavigation} from '@react-navigation/native';
 
 const Reportitem = () => {
   const [selected, setSelected] = useState('lost');
@@ -30,9 +35,10 @@ const Reportitem = () => {
   const [imageUri, setImageUri] = useState(null);
   const [location, setLocation] = useState('');
   const [contactInfo, setContactInfo] = useState('');
-
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+  const [imagePickerModalVisible, setImagePickerModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   const categoryOptions = [
     'Electronics',
@@ -96,12 +102,32 @@ const Reportitem = () => {
     setTimeout(resetForm, 100);
   };
 
-  const pickImage = () => {
+  const openCamera = () => {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        cameraType: 'back',
+      },
+      response => {
+        setImagePickerModalVisible(false);
+        if (
+          !response.didCancel &&
+          response.assets &&
+          response.assets.length > 0
+        ) {
+          setImageUri(response.assets[0].uri);
+        }
+      },
+    );
+  };
+
+  const openGallery = () => {
     launchImageLibrary(
       {
         mediaType: 'photo',
       },
       response => {
+        setImagePickerModalVisible(false);
         if (
           !response.didCancel &&
           response.assets &&
@@ -127,6 +153,14 @@ const Reportitem = () => {
           <MyHeader
             ScreenName={'Report Item'}
             style={styles.header}
+            leftView={
+              <Icon
+                name="arrow-back"
+                size={30}
+                color={Colors.black}
+                onPress={() => navigation.goBack()}
+              />
+            }
             rightView={
               <View>
                 <Image
@@ -293,10 +327,91 @@ const Reportitem = () => {
               />
 
               <TouchableOpacity
-                onPress={pickImage}
-                style={styles.imagePickerButton}>
-                <MyText text="Choose Image" />
+                onPress={() => setImagePickerModalVisible(true)}
+                style={styles.dottedBox}>
+                <View style={{alignItems: 'center'}}>
+                  <UploadIcon
+                    name="upload"
+                    size={responsiveWidth(8)}
+                    color={Colors.gray}
+                    style={styles.uploadIcon}
+                  />
+
+                  <MyText
+                    text="Click to upload"
+                    fontSize={responsiveFontSize(2)}
+                    fontWeight="600"
+                    color={Colors.black}
+                    textStyle={{marginTop: responsiveHeight(1)}}
+                  />
+
+                  <MyText
+                    text="PNG, JPG up to 10MB"
+                    fontSize={responsiveFontSize(1.6)}
+                    color={Colors.gray}
+                    textStyle={{marginVertical: responsiveHeight(0.5)}}
+                  />
+
+                  <MyButton
+                    text="Choose File"
+                    onPress={() => setImagePickerModalVisible(true)}
+                    backgroundColor={Colors.primary}
+                    textColor={Colors.white}
+                    fontWeight="500"
+                    style={{padding: responsiveWidth(2)}}
+                  />
+                </View>
               </TouchableOpacity>
+
+              <Modal
+                transparent
+                animationType="slide"
+                visible={imagePickerModalVisible}
+                onRequestClose={() => setImagePickerModalVisible(false)}>
+                <Pressable
+                  onPress={() => setImagePickerModalVisible(false)}
+                  style={styles.modalOverlay}
+                />
+
+                <View style={styles.modalContainer}>
+                  <MyText
+                    text="Upload Image"
+                    fontSize={responsiveFontSize(2.5)}
+                    fontWeight="600"
+                    color={Colors.black}
+                    textStyle={{marginBottom: responsiveHeight(2)}}
+                  />
+
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={openCamera}>
+                    <MyText
+                      text="📷 Open Camera"
+                      color={Colors.black}
+                      fontWeight="500"
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={openGallery}>
+                    <MyText
+                      text="🖼️ Choose from Gallery"
+                      color={Colors.black}
+                      fontWeight="500"
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.modalButton,
+                      {backgroundColor: Colors.lightGray},
+                    ]}
+                    onPress={() => setImagePickerModalVisible(false)}>
+                    <MyText text="Cancel" color={Colors.darkGray} />
+                  </TouchableOpacity>
+                </View>
+              </Modal>
 
               {imageUri && (
                 <Image source={{uri: imageUri}} style={styles.previewImage} />
@@ -417,6 +532,52 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     flex: 1,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+
+  modalContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    backgroundColor: Colors.white,
+    padding: responsiveWidth(5),
+    borderTopLeftRadius: responsiveWidth(5),
+    borderTopRightRadius: responsiveWidth(5),
+    alignItems: 'center',
+  },
+
+  modalButton: {
+    width: '100%',
+    backgroundColor: Colors.lightGray,
+    paddingVertical: responsiveHeight(1.5),
+    borderRadius: responsiveWidth(3),
+    alignItems: 'center',
+    marginBottom: responsiveHeight(1.5),
+  },
+  dottedBox: {
+    borderWidth: 1.5,
+    borderColor: Colors.gray,
+    borderStyle: 'dashed',
+    borderRadius: responsiveWidth(3),
+    padding: responsiveHeight(3),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: responsiveHeight(2),
+  },
+
+  uploadIcon: {
+    width: responsiveWidth(10),
+    height: responsiveWidth(10),
+    tintColor: Colors.gray, // optional
+  },
+
+  chooseFileButton: {
+    paddingHorizontal: responsiveWidth(3),
+    borderRadius: responsiveWidth(2),
+    marginTop: responsiveHeight(1),
   },
 });
 
