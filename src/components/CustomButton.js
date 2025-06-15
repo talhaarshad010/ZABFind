@@ -21,8 +21,8 @@ const MyButton = ({
   style = {},
   textstyle = {},
   fontWeight = 'bold',
-  backgroundColor = Colors.blue, // Default background color
-  textColor = Colors.white, // Default text color
+  backgroundColor = Colors.blue,
+  textColor = Colors.white,
 }) => {
   return (
     <TouchableOpacity

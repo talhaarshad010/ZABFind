@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     borderWidth: responsiveWidth(0.4),
   },
   inputInner: {
-    width: responsiveWidth(58),
+    width: responsiveWidth(80),
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

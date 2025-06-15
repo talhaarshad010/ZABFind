@@ -11,6 +11,7 @@ import {
 } from 'react-native-responsive-dimensions';
 import Reportitem from '../screens/Reportitem';
 import Admindashboard from '../screens/Admindashboard';
+import Profile from '../screens/Profile';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,7 +20,7 @@ const BottomTab = () => {
     <Tab.Navigator
       screenOptions={({route}) => ({
         tabBarStyle: {
-          height: responsiveHeight(10),
+          height: responsiveHeight(9),
         },
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.grayInput,
@@ -40,6 +41,9 @@ const BottomTab = () => {
               ? 'shield-checkmark'
               : 'shield-checkmark-outline';
           }
+          // else if (route.name === 'My Profile') {
+          //   iconName = focused ? 'person-circle' : 'person-circle-outline';
+          // }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -47,10 +51,9 @@ const BottomTab = () => {
       <Tab.Screen name="Dashboard" component={Dashboard} />
       <Tab.Screen name="AddItem" component={Reportitem} />
       <Tab.Screen name="AdminDashboard" component={Admindashboard} />
+      {/* <Tab.Screen name="My Profile" component={Profile} /> */}
     </Tab.Navigator>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default BottomTab;

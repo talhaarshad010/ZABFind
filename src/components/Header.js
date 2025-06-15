@@ -19,14 +19,12 @@ const MyHeader = ({
 }) => {
   return (
     <View style={[styles.header, style]}>
-      {/* Left View (optional) */}
       {leftView && (
         <TouchableOpacity onPress={onPressleft} style={styles.left}>
           {leftView}
         </TouchableOpacity>
       )}
 
-      {/* Screen Name centered */}
       <View style={styles.center}>
         <MyText
           color={Colors.black}
@@ -36,11 +34,10 @@ const MyHeader = ({
         />
       </View>
 
-      {/* Right View or Text (optional) */}
       {rightView ? (
-        <TouchableOpacity onPress={onPressright} style={styles.right}>
+        <View onPress={onPressright} style={styles.right}>
           {rightView}
-        </TouchableOpacity>
+        </View>
       ) : rightText ? (
         <Text style={styles.rightText}>{rightText}</Text>
       ) : (
@@ -54,12 +51,11 @@ export default MyHeader;
 
 const styles = StyleSheet.create({
   header: {
-    height: responsiveHeight(8),
+    height: responsiveHeight(7),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-    paddingHorizontal: responsiveWidth(3),
   },
   left: {
     position: 'absolute',
