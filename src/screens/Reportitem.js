@@ -8,6 +8,7 @@ import {
   ScrollView,
   Modal,
   Pressable,
+  PermissionsAndroid,
 } from 'react-native';
 import React, {useState} from 'react';
 import MyHeader from '../components/Header';
@@ -102,7 +103,43 @@ const Reportitem = () => {
     setTimeout(resetForm, 100);
   };
 
-  const openCamera = () => {
+  const requestCameraPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: 'Camera Permission',
+          message: 'This app needs access to your camera.',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    return true; // iOS handles via Info.plist
+  };
+
+  const requestStoragePermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message: 'This app needs access to your photo library.',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    return true;
+  };
+
+  const openCamera = async () => {
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) {
+      console.warn('Camera permission denied');
+      return;
+    }
+
     launchCamera(
       {
         mediaType: 'photo',
@@ -121,7 +158,13 @@ const Reportitem = () => {
     );
   };
 
-  const openGallery = () => {
+  const openGallery = async () => {
+    const hasPermission = await requestStoragePermission();
+    if (!hasPermission) {
+      console.warn('Storage permission denied');
+      return;
+    }
+
     launchImageLibrary(
       {
         mediaType: 'photo',

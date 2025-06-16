@@ -7,6 +7,7 @@ import {
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
 import HighlightedText from './HighlightedText';
+import {useNavigation} from '@react-navigation/native';
 
 const ItemCard = ({
   imageUri,
@@ -19,8 +20,13 @@ const ItemCard = ({
   highlight,
   category, // <-- added category
 }) => {
+  const navigation = useNavigation();
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate('ViewDetails');
+      }}
+      style={styles.card}>
       <Image source={{uri: imageUri}} style={styles.image} />
 
       <View style={styles.details}>

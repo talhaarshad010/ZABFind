@@ -7,6 +7,9 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Modal,
+  Pressable,
+  PermissionsAndroid,
 } from 'react-native';
 import MyTextInput from '../components/TextInputComponent';
 import MyHeader from '../components/Header';
@@ -19,6 +22,7 @@ import {
   responsiveWidth,
 } from 'react-native-responsive-dimensions';
 import MyText from '../components/textcomponent';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 const EditProfileScreen = ({navigation}) => {
   const [form, setForm] = useState({
@@ -29,6 +33,8 @@ const EditProfileScreen = ({navigation}) => {
     address: '',
     bio: '',
   });
+  const [imagePickerModalVisible, setImagePickerModalVisible] = useState(false);
+  const [imageUri, setImageUri] = useState(null);
 
   const handleChange = (field, value) => {
     setForm({...form, [field]: value});
@@ -52,6 +58,85 @@ const EditProfileScreen = ({navigation}) => {
     }
   };
 
+  const requestCameraPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: 'Camera Permission',
+          message: 'This app needs access to your camera.',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    return true; // iOS handles via Info.plist
+  };
+
+  const requestStoragePermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message: 'This app needs access to your photo library.',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    return true;
+  };
+
+  const openCamera = async () => {
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) {
+      console.warn('Camera permission denied');
+      return;
+    }
+
+    launchCamera(
+      {
+        mediaType: 'photo',
+        cameraType: 'back',
+      },
+      response => {
+        setImagePickerModalVisible(false);
+        if (
+          !response.didCancel &&
+          response.assets &&
+          response.assets.length > 0
+        ) {
+          setImageUri(response.assets[0].uri);
+        }
+      },
+    );
+  };
+
+  const openGallery = async () => {
+    const hasPermission = await requestStoragePermission();
+    if (!hasPermission) {
+      console.warn('Storage permission denied');
+      return;
+    }
+
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+      },
+      response => {
+        setImagePickerModalVisible(false);
+        if (
+          !response.didCancel &&
+          response.assets &&
+          response.assets.length > 0
+        ) {
+          setImageUri(response.assets[0].uri);
+        }
+      },
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       style={{flex: 1, backgroundColor: Colors.white}}
@@ -59,7 +144,7 @@ const EditProfileScreen = ({navigation}) => {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
       <MyHeader
         style={styles.header}
-        ScreenName="Edit Profile"
+        ScreenName="Profile"
         leftView={<Icon name="arrow-left" size={24} color={Colors.black} />}
         rightView={
           <Image source={require('../assets/logo.png')} style={styles.logo} />
@@ -74,14 +159,67 @@ const EditProfileScreen = ({navigation}) => {
           <View style={styles.profileImageContainer}>
             <Image
               source={{
-                uri: 'https://s3.eu-central-1.amazonaws.com/uploads.mangoweb.org/shared-prod/visegradfund.org/uploads/2021/08/placeholder-male.jpg',
+                uri: imageUri
+                  ? imageUri
+                  : 'https://s3.eu-central-1.amazonaws.com/uploads.mangoweb.org/shared-prod/visegradfund.org/uploads/2021/08/placeholder-male.jpg',
               }}
               style={styles.profileImage}
             />
-            <TouchableOpacity style={styles.editIconContainer}>
+
+            <TouchableOpacity
+              style={styles.editIconContainer}
+              onPress={() => setImagePickerModalVisible(true)}>
               <Icon name="edit" size={16} color={Colors.white} />
             </TouchableOpacity>
           </View>
+
+          <Modal
+            transparent
+            animationType="slide"
+            visible={imagePickerModalVisible}
+            onRequestClose={() => setImagePickerModalVisible(false)}>
+            <Pressable
+              onPress={() => setImagePickerModalVisible(false)}
+              style={styles.modalOverlay}
+            />
+
+            <View style={styles.modalContainer}>
+              <MyText
+                text="Upload Image"
+                fontSize={responsiveFontSize(2.5)}
+                fontWeight="600"
+                color={Colors.black}
+                textStyle={{marginBottom: responsiveHeight(2)}}
+              />
+
+              <TouchableOpacity style={styles.modalButton} onPress={openCamera}>
+                <MyText
+                  text="📷 Open Camera"
+                  color={Colors.black}
+                  fontWeight="500"
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={openGallery}>
+                <MyText
+                  text="🖼️ Choose from Gallery"
+                  color={Colors.black}
+                  fontWeight="500"
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.modalButton,
+                  {backgroundColor: Colors.lightGray},
+                ]}
+                onPress={() => setImagePickerModalVisible(false)}>
+                <MyText text="Cancel" color={Colors.darkGray} />
+              </TouchableOpacity>
+            </View>
+          </Modal>
 
           <MyText
             text="John Doe"
@@ -259,7 +397,7 @@ const styles = StyleSheet.create({
   editIconContainer: {
     position: 'absolute',
     bottom: 0,
-    right: responsiveWidth(33),
+    right: responsiveWidth(2),
     backgroundColor: Colors.primary,
     borderRadius: 50,
     padding: responsiveWidth(1.5),
@@ -341,5 +479,29 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightGray,
     marginTop: responsiveHeight(1),
     marginBottom: responsiveHeight(1),
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+
+  modalContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    backgroundColor: Colors.white,
+    padding: responsiveWidth(5),
+    borderTopLeftRadius: responsiveWidth(5),
+    borderTopRightRadius: responsiveWidth(5),
+    alignItems: 'center',
+  },
+
+  modalButton: {
+    width: '100%',
+    backgroundColor: Colors.lightGray,
+    paddingVertical: responsiveHeight(1.5),
+    borderRadius: responsiveWidth(3),
+    alignItems: 'center',
+    marginBottom: responsiveHeight(1.5),
   },
 });

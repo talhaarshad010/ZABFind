@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  FlatList,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import WrapperContainer from '../components/WrapperContainer';
@@ -89,79 +90,81 @@ const Dashboard = () => {
         />
       </View>
 
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.searchSection}>
-          <MyTextInput
-            placeholder={'Search for items by their names or categories'}
-            placeholderTextColor={Colors.gray}
-            LeftView={<Icon name="search" size={20} color={Colors.gray} />}
-            value={searchText}
-            onChangeText={setSearchText}
-          />
+      <FlatList
+        showsVerticalScrollIndicator={false}
+        data={filteredData}
+        keyExtractor={item => item.id.toString()}
+        contentContainerStyle={styles.scrollContainer}
+        ListHeaderComponent={
+          <View style={styles.searchSection}>
+            <MyTextInput
+              placeholder={'Search for items by their names or categories'}
+              placeholderTextColor={Colors.gray}
+              LeftView={<Icon name="search" size={20} color={Colors.gray} />}
+              value={searchText}
+              onChangeText={setSearchText}
+            />
 
-          <View style={styles.dropdownWrapper}>
-            <View
-              style={{flex: 1, zIndex: openDropdown === 'category' ? 2 : 1}}>
-              <TextInputDropdown
-                defaultValue={categoryFilter}
-                data={[
-                  'All Categories',
-                  'Electronics',
-                  'Clothing',
-                  'Books',
-                  'Keys',
-                  'Documents',
-                  'Other',
-                ]}
-                onSelect={item => {
-                  setCategoryFilter(item);
-                  setOpenDropdown(null);
-                }}
-                isOpen={openDropdown === 'category'}
-                onToggle={() =>
-                  setOpenDropdown(
-                    openDropdown === 'category' ? null : 'category',
-                  )
-                }
-              />
-            </View>
+            <View style={styles.dropdownWrapper}>
+              <View
+                style={{flex: 1, zIndex: openDropdown === 'category' ? 2 : 1}}>
+                <TextInputDropdown
+                  defaultValue={categoryFilter}
+                  data={[
+                    'All Categories',
+                    'Electronics',
+                    'Clothing',
+                    'Books',
+                    'Keys',
+                    'Documents',
+                    'Other',
+                  ]}
+                  onSelect={item => {
+                    setCategoryFilter(item);
+                    setOpenDropdown(null);
+                  }}
+                  isOpen={openDropdown === 'category'}
+                  onToggle={() =>
+                    setOpenDropdown(
+                      openDropdown === 'category' ? null : 'category',
+                    )
+                  }
+                />
+              </View>
 
-            <View style={{flex: 1, zIndex: openDropdown === 'status' ? 2 : 1}}>
-              <TextInputDropdown
-                defaultValue={statusFilter}
-                data={['All Items', 'Lost', 'Found']}
-                onSelect={item => {
-                  setStatusFilter(item);
-                  setOpenDropdown(null);
-                }}
-                isOpen={openDropdown === 'status'}
-                onToggle={() =>
-                  setOpenDropdown(openDropdown === 'status' ? null : 'status')
-                }
-              />
+              <View
+                style={{flex: 1, zIndex: openDropdown === 'status' ? 2 : 1}}>
+                <TextInputDropdown
+                  defaultValue={statusFilter}
+                  data={['All Items', 'Lost', 'Found']}
+                  onSelect={item => {
+                    setStatusFilter(item);
+                    setOpenDropdown(null);
+                  }}
+                  isOpen={openDropdown === 'status'}
+                  onToggle={() =>
+                    setOpenDropdown(openDropdown === 'status' ? null : 'status')
+                  }
+                />
+              </View>
             </View>
           </View>
-        </View>
-
-        <View style={{paddingBottom: responsiveHeight(10)}}>
-          {filteredData.map(item => (
-            <ItemCard
-              key={item.id}
-              imageUri={item.imageUri}
-              title={item.title}
-              description={item.description}
-              location={item.location}
-              date={item.date}
-              category={item.category}
-              username={item.username}
-              status={item.status}
-              highlight={searchText}
-            />
-          ))}
-        </View>
-      </ScrollView>
+        }
+        renderItem={({item}) => (
+          <ItemCard
+            imageUri={item.imageUri}
+            title={item.title}
+            description={item.description}
+            location={item.location}
+            date={item.date}
+            category={item.category}
+            username={item.username}
+            status={item.status}
+            highlight={searchText}
+          />
+        )}
+        ListFooterComponent={<View style={{height: responsiveHeight(10)}} />}
+      />
     </WrapperContainer>
   );
 };
