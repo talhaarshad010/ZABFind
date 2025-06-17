@@ -1,5 +1,5 @@
-import {Image, StyleSheet, View, Linking} from 'react-native';
-import React from 'react';
+import {Image, StyleSheet, View, Linking, Modal, Pressable} from 'react-native';
+import React, {useState} from 'react';
 import WrapperContainer from '../components/WrapperContainer';
 import MyHeader from '../components/Header';
 import Icon from 'react-native-vector-icons/Feather';
@@ -15,12 +15,12 @@ import {useNavigation} from '@react-navigation/native';
 
 const Viewdetails = () => {
   const navigation = useNavigation();
+  const [imageModalVisible, setImageModalVisible] = useState(false);
 
-  // Dummy data (replace with actual props or Redux)
   const item = {
     name: 'Lost Wallet',
     imageUri:
-      'https://static1.howtogeekimages.com/wordpress/wp-content/uploads/2023/08/52421386363_8747a89956_o.jpg?q=50&fit=crop&w=1140&h=&dpr=1.5', // change to actual URI
+      'https://static1.howtogeekimages.com/wordpress/wp-content/uploads/2023/08/52421386363_8747a89956_o.jpg?q=50&fit=crop&w=1140&h=&dpr=1.5',
     description: 'Black leather wallet with important cards.',
     location: 'Library - Main Campus',
     date: '2025-06-14',
@@ -43,27 +43,44 @@ const Viewdetails = () => {
       />
 
       <View style={styles.container}>
+        {/* Image Zoom Modal */}
+        <Modal visible={imageModalVisible} transparent={true}>
+          <Pressable
+            style={styles.modalContainer}
+            onPress={() => setImageModalVisible(false)}>
+            <Image source={{uri: item.imageUri}} style={styles.modalImage} />
+          </Pressable>
+        </Modal>
+
         {/* Item Info Box */}
         <View style={styles.box}>
           <MyText
             text={item.name}
             fontSize={responsiveFontSize(3)}
-            fontWeight="600"
+            fontWeight="700"
+            style={{marginBottom: responsiveHeight(1.5)}}
           />
-          <Image source={{uri: item.imageUri}} style={styles.itemImage} />
+
+          <Pressable onPress={() => setImageModalVisible(true)}>
+            <Image source={{uri: item.imageUri}} style={styles.itemImage} />
+          </Pressable>
 
           <MyText
-            text={`Description: ${item.description}`}
-            style={styles.infoText}
+            text="Description"
+            fontWeight="bold"
+            style={styles.labelText}
           />
+          <MyText text={item.description} style={styles.infoText} />
+
+          <MyText text="Last Seen" fontWeight="bold" style={styles.labelText} />
+          <MyText text={item.location} style={styles.infoText} />
+
           <MyText
-            text={`Last Seen: ${item.location}`}
-            style={styles.infoText}
+            text="Date Reported"
+            fontWeight="bold"
+            style={styles.labelText}
           />
-          <MyText
-            text={`Date Reported: ${item.date}`}
-            style={styles.infoText}
-          />
+          <MyText text={item.date} style={styles.infoText} />
         </View>
 
         {/* Contact Info Box */}
@@ -92,13 +109,17 @@ const Viewdetails = () => {
                   color={Colors.white}
                   style={{marginRight: 8}}
                 />
-                <MyText text="Call" color={Colors.white} fontWeight="bold" />
+                <MyText
+                  text="Call Now"
+                  color={Colors.white}
+                  fontWeight="bold"
+                />
               </View>
             }
           />
 
           <MyButton
-            backgroundColor={Colors.secondary}
+            backgroundColor={'#16A34A'}
             onPress={() => Linking.openURL(`mailto:${item.email}`)}
             style={[styles.iconButton, {marginTop: responsiveHeight(1.5)}]}
             text={
@@ -151,17 +172,27 @@ const styles = StyleSheet.create({
   box: {
     borderWidth: 1,
     borderColor: Colors.lightGray,
-    borderRadius: responsiveWidth(2),
+    borderRadius: responsiveWidth(3),
     padding: responsiveWidth(4),
     backgroundColor: Colors.white,
-    elevation: 2,
+    elevation: 3,
+    shadowColor: '#999',
+    shadowOpacity: 0.1,
+    shadowOffset: {width: 0, height: 1},
+    shadowRadius: 2,
   },
   itemImage: {
     width: '100%',
     height: responsiveHeight(25),
-    resizeMode: 'contain',
+    resizeMode: 'cover',
     marginVertical: responsiveHeight(2),
     borderRadius: responsiveWidth(2),
+  },
+  labelText: {
+    fontSize: responsiveFontSize(1.9),
+    marginTop: responsiveHeight(1),
+    marginBottom: responsiveHeight(0.5),
+    color: Colors.black,
   },
   infoText: {
     marginBottom: responsiveHeight(1),
@@ -175,6 +206,18 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     marginTop: responsiveHeight(2),
-    paddingVertical: responsiveHeight(1),
+    paddingVertical: responsiveHeight(1.2),
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#000000aa',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalImage: {
+    width: '90%',
+    height: '70%',
+    resizeMode: 'contain',
+    borderRadius: 10,
   },
 });
