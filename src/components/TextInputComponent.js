@@ -154,13 +154,14 @@ const styles = StyleSheet.create({
   inputInner: {
     width: responsiveWidth(80),
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
     alignItems: 'center',
   },
   textInput: {
-    width: responsiveWidth(50),
+    width: responsiveWidth(10),
     flex: 1,
     color: Colors.black,
+    fontSize: responsiveFontSize(1.7),
   },
   fieldName: {
     fontWeight: '500',
@@ -169,11 +170,18 @@ const styles = StyleSheet.create({
   },
   multilineContainer: {
     minHeight: responsiveHeight(15),
+    borderRadius: responsiveWidth(2),
+    backgroundColor: Colors.white,
+    borderColor: Colors.lightGray,
+    borderWidth: responsiveWidth(0.4),
+    paddingHorizontal: responsiveWidth(4),
     paddingVertical: responsiveHeight(1.5),
-    alignItems: 'flex-start',
   },
   textAreaStyle: {
     textAlignVertical: 'top',
-    height: '100%',
+    paddingVertical: responsiveHeight(1), // add this
+    flex: 1, // replace height: 100%
+    fontSize: responsiveFontSize(1.7),
+    color: Colors.black,
   },
 });

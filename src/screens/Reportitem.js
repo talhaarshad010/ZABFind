@@ -9,6 +9,7 @@ import {
   Modal,
   Pressable,
   PermissionsAndroid,
+  TextInput,
 } from 'react-native';
 import React, {useState} from 'react';
 import MyHeader from '../components/Header';
@@ -43,19 +44,33 @@ const Reportitem = () => {
 
   const categoryOptions = [
     'Electronics',
-    'Clothing',
-    'Documents',
+    'Personal Items',
+    'Keys',
     'Accessories',
-    'Others',
+    'Books',
+    'Documents',
+    'Clothing',
+    'Sports Equipment',
+    'Other',
   ];
 
   const locationOptions = [
-    'Main Gate',
+    'Library - 1st Floor',
+    'Library - 2nd Floor',
+    'Library - 3rd Floor',
     'Cafeteria',
-    'Library',
-    'Parking Lot',
-    'Admin Block',
-    'Auditorium',
+    'Computer Lab 1',
+    'Computer Lab 2',
+    'Computer Lab 3',
+    'Lecture Hall 1',
+    'Lecture Hall 2',
+    'Lecture Hall 3',
+    'Sports Complex',
+    'Parking Lot A',
+    'Parking Lot B',
+    'Main Entrance',
+    'Administration Office',
+    'Student Lounge',
     'Other',
   ];
 
@@ -323,18 +338,41 @@ const Reportitem = () => {
                 }}
               />
 
-              <MyTextInput
+              <MyText
+                text="Description *"
+                fontWeight="500"
+                fontSize={responsiveFontSize(2.2)}
+                color={Colors.black}
+                textStyle={styles.fieldLabel}
+              />
+
+              <View style={styles.descriptionContainer}>
+                <TextInput
+                  placeholder="Provide a detailed description including color, brand, size, distinctive features, etc."
+                  placeholderTextColor={Colors.gray}
+                  value={description}
+                  onChangeText={setDescription}
+                  multiline={true}
+                  numberOfLines={5}
+                  style={styles.descriptionInput}
+                  textAlignVertical="top"
+                  allowFontScaling={false}
+                  cursorColor={Colors.black}
+                />
+              </View>
+
+              {/* <MyTextInput
                 fieldName="Description *"
                 placeholder="Provide a detailed description including color, brand, size, distinctive features, etc."
                 value={description}
                 onChangeText={setDescription}
                 inputStyle={styles.descriptionInput}
-                props={{
-                  multiline: true,
-                  numberOfLines: 4,
-                  textAlignVertical: 'top',
-                }}
-              />
+                // props={{
+                //   multiline: true,
+                //   numberOfLines: 4,
+                //   textAlignVertical: 'top',
+                // }}
+              /> */}
 
               <MyText
                 text="Location *"
@@ -621,6 +659,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: responsiveWidth(3),
     borderRadius: responsiveWidth(2),
     marginTop: responsiveHeight(1),
+  },
+  descriptionContainer: {
+    minHeight: responsiveHeight(15),
+    borderRadius: responsiveWidth(2),
+    backgroundColor: Colors.white,
+    borderColor: Colors.lightGray,
+    borderWidth: responsiveWidth(0.4),
+    paddingHorizontal: responsiveWidth(4),
+    paddingVertical: responsiveHeight(1.5),
+  },
+
+  descriptionInput: {
+    flex: 1,
+    fontSize: responsiveFontSize(1.7),
+    color: Colors.black,
+    paddingVertical: 0, // reduce internal padding
   },
 });
 

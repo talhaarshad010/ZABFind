@@ -1,8 +1,8 @@
 import {combineReducers} from '@reduxjs/toolkit';
-
+import authSlice from './Auth';
+import {Auth} from '../Api/Auth';
 const Reducers = combineReducers({
-  // Auth: authSlice,
-  // [TrainerAuth.reducerPath]: TrainerAuth.reducer,
-  //more reducers can be added here
+  Auth: authSlice,
+  [Auth.reducerPath]: Auth.reducer,
 });
 export default Reducers;

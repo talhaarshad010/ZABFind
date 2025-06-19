@@ -21,11 +21,40 @@ import {
 } from 'react-native-responsive-dimensions';
 import MyButton from '../components/CustomButton';
 import {useNavigation} from '@react-navigation/native';
-
+import {useSignUpMutation} from '../store/Api/Auth';
 const Signup = () => {
   const [rememberMe, setRememberMe] = useState(false);
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [studentId, setStudentId] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const toggleRemember = () => setRememberMe(!rememberMe);
   const navigation = useNavigation();
+
+  const [signUp, {isLoading}] = useSignUpMutation();
+
+  const handleSignin = async () => {
+    try {
+      const response = await signUp({
+        fullName,
+        emailAddress: email,
+        studentId,
+        password,
+        confirmPassword,
+        phoneNumber: '00000000000',
+        address: 'Dummy address',
+        bio: '',
+        profileImage: '',
+      }).unwrap();
+
+      console.log('Signup successful:', response);
+      navigation.navigate('LogIn');
+    } catch (error) {
+      console.error('Signup failed:', error);
+    }
+  };
+
   return (
     <WrapperContainer>
       <KeyboardAvoidingView
@@ -58,25 +87,40 @@ const Signup = () => {
               <MyTextInput
                 fieldName={'Full Name'}
                 placeholder={'Enter your full name'}
+                value={fullName}
+                onChangeText={setFullName}
               />
+
               <MyTextInput
                 fieldName={'Email Address'}
                 placeholder={'Your@email.com'}
+                value={email}
+                onChangeText={setEmail}
               />
+
               <MyTextInput
                 fieldName={'Student ID'}
                 placeholder={'Enter your student ID'}
+                value={studentId}
+                onChangeText={setStudentId}
               />
+
               <MyTextInput
                 fieldName={'Password'}
                 placeholder={'Enter your password'}
                 RightView={true}
+                value={password}
+                onChangeText={setPassword}
               />
+
               <MyTextInput
                 fieldName={'Confirm Password'}
                 placeholder={'Enter your confirm password'}
                 RightView={true}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
               />
+
               <View style={styles.RememberAndForget}>
                 <TouchableOpacity
                   style={styles.RememberBox}
@@ -114,7 +158,7 @@ const Signup = () => {
                   fontSize: responsiveFontSize(3),
                   width: responsiveWidth(90),
                 }}
-                onPress={() => console.log('Button Pressed')}
+                onPress={handleSignin()}
               />
               <View
                 style={{
