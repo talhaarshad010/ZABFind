@@ -23,10 +23,11 @@ import MyText from '../components/textcomponent';
 import ManageItems from '../components/ManageItems';
 import FoundItems from '../components/FoundItems';
 import ManageUsers from '../components/ManageUsers';
+import {useNavigation} from '@react-navigation/native';
 
 const Admindashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
-
+  const navigation = useNavigation();
   return (
     <WrapperContainer>
       <View>
@@ -34,7 +35,7 @@ const Admindashboard = () => {
           ScreenName={'Admin Dashboard'}
           style={{backgroundColor: Colors.white, elevation: 10}}
           leftView={
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.openDrawer()}>
               <Icon
                 name="person-circle-outline"
                 size={30}

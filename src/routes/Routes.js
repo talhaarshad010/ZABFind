@@ -1,15 +1,50 @@
-import {StatusBar, StyleSheet} from 'react-native';
+// import {StatusBar, StyleSheet} from 'react-native';
+// import React from 'react';
+// import {NavigationContainer} from '@react-navigation/native';
+// import StackRoute from './stack';
+// import AuthStack from './auth';
+// import {useSelector} from 'react-redux';
+
+// const Routes = () => {
+//   const token = useSelector(state => state?.Auth?.token);
+//   console.log('token in main Route: ', token);
+//   return (
+//     <NavigationContainer>
+//       <StatusBar hidden={true} />
+//       <AuthStack />
+//       {/* <StackRoute/> */}
+//       {/* {token ? <StackRoute /> : <AuthStack />} */}
+//     </NavigationContainer>
+//   );
+// };
+
+// export default Routes;
+
+import {StatusBar} from 'react-native';
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import StackRoute from './stack';
 import AuthStack from './auth';
+import {useSelector} from 'react-redux';
 
 const Routes = () => {
+  const token = useSelector(state => state?.Auth?.token);
+  const isProfileComplete = useSelector(
+    state => state?.Auth?.isProfileComplete,
+  );
+
   return (
     <NavigationContainer>
       <StatusBar hidden={true} />
-      {/* <AuthStack /> */}
-      <StackRoute />
+      {token ? (
+        isProfileComplete ? (
+          <StackRoute />
+        ) : (
+          <AuthStack initialRouteName="CompleteProfile" />
+        )
+      ) : (
+        <AuthStack />
+      )}
     </NavigationContainer>
   );
 };

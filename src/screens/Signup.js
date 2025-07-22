@@ -22,6 +22,9 @@ import {
 import MyButton from '../components/CustomButton';
 import {useNavigation} from '@react-navigation/native';
 import {useSignUpMutation} from '../store/Api/Auth';
+import {checkMinLength, validateEmail} from '../utils/validations';
+import ToastMessage from '../hooks/ToastMessage';
+
 const Signup = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [fullName, setFullName] = useState('');
@@ -31,27 +34,80 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const toggleRemember = () => setRememberMe(!rememberMe);
   const navigation = useNavigation();
+  const {Toasts} = ToastMessage();
+  const [signUp] = useSignUpMutation();
 
-  const [signUp, {isLoading}] = useSignUpMutation();
-
-  const handleSignin = async () => {
+  const handleSignup = async () => {
     try {
-      const response = await signUp({
-        fullName,
-        emailAddress: email,
-        studentId,
-        password,
-        confirmPassword,
-        phoneNumber: '00000000000',
-        address: 'Dummy address',
-        bio: '',
-        profileImage: '',
-      }).unwrap();
+      const trimmedFullName = fullName.trim();
+      const trimmedEmail = email.trim();
+      const trimmedStudentId = studentId.trim();
+      const trimmedPassword = password.trim();
+      const trimmedConfirmPassword = confirmPassword.trim();
 
-      console.log('Signup successful:', response);
+      if (
+        !trimmedFullName ||
+        !trimmedEmail ||
+        !trimmedStudentId ||
+        !trimmedPassword ||
+        !trimmedConfirmPassword
+      ) {
+        return Toasts('Error', 'Please fill all fields', 'error', 2000);
+      }
+
+      if (trimmedPassword !== trimmedConfirmPassword) {
+        return Toasts('Error', 'Passwords do not match', 'error', 2000);
+      }
+
+      if (!validateEmail(trimmedEmail)) {
+        return Toasts(
+          'Error',
+          'Please enter a valid email address',
+          'error',
+          2000,
+        );
+      }
+
+      if (checkMinLength(trimmedPassword, 8, 'Password')) {
+        return Toasts(
+          'Error',
+          'Password must be at least 8 characters long',
+          'error',
+          2000,
+        );
+      }
+
+      const payload = {
+        fullName: trimmedFullName,
+        emailAddress: trimmedEmail,
+        studentId: trimmedStudentId,
+        password: trimmedPassword,
+        confirmPassword: trimmedConfirmPassword,
+      };
+
+      console.log('Signup payload:', payload);
+
+      const res = await signUp(payload).unwrap();
+
+      Toasts('Success', 'User Created Successfully', 'success', 2000);
+
+      // Reset form
+      setFullName('');
+      setEmail('');
+      setStudentId('');
+      setPassword('');
+      setConfirmPassword('');
+      setRememberMe(false);
+
       navigation.navigate('LogIn');
     } catch (error) {
-      console.error('Signup failed:', error);
+      console.log('Signup error:', error);
+      Toasts(
+        'Error',
+        error?.data?.message || 'Something went wrong!',
+        'error',
+        2000,
+      );
     }
   };
 
@@ -88,21 +144,23 @@ const Signup = () => {
                 fieldName={'Full Name'}
                 placeholder={'Enter your full name'}
                 value={fullName}
-                onChangeText={setFullName}
+                onChangeText={text => {
+                  setFullName(text);
+                }}
               />
 
               <MyTextInput
                 fieldName={'Email Address'}
                 placeholder={'Your@email.com'}
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={text => setEmail(text)}
               />
 
               <MyTextInput
                 fieldName={'Student ID'}
                 placeholder={'Enter your student ID'}
                 value={studentId}
-                onChangeText={setStudentId}
+                onChangeText={text => setStudentId(text)}
               />
 
               <MyTextInput
@@ -110,7 +168,7 @@ const Signup = () => {
                 placeholder={'Enter your password'}
                 RightView={true}
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={text => setPassword(text)}
               />
 
               <MyTextInput
@@ -118,7 +176,9 @@ const Signup = () => {
                 placeholder={'Enter your confirm password'}
                 RightView={true}
                 value={confirmPassword}
-                onChangeText={setConfirmPassword}
+                onChangeText={text => {
+                  setConfirmPassword(text);
+                }}
               />
 
               <View style={styles.RememberAndForget}>
@@ -134,16 +194,14 @@ const Signup = () => {
                   )}
                 </TouchableOpacity>
                 <MyText fontSize={responsiveFontSize(1.7)}>
-                  <Text style={{color: Colors.black}}>I agrree to the</Text>
+                  <Text style={{color: Colors.black}}>I agree to the</Text>
                   <Text
                     style={{
                       color: Colors.primary,
-                    }}>{` Term of service `}</Text>
-                  <Text style={{color: Colors.black}}>and </Text>
+                    }}>{` Terms of Service `}</Text>
+                  <Text style={{color: Colors.black}}>and</Text>
                   <Text
-                    style={{
-                      color: Colors.primary,
-                    }}>{` Privacy policy `}</Text>
+                    style={{color: Colors.primary}}>{` Privacy Policy `}</Text>
                 </MyText>
               </View>
             </View>
@@ -158,7 +216,7 @@ const Signup = () => {
                   fontSize: responsiveFontSize(3),
                   width: responsiveWidth(90),
                 }}
-                onPress={handleSignin()}
+                onPress={handleSignup}
               />
               <View
                 style={{

@@ -2,20 +2,21 @@ import * as React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Dashboard from '../screens/Dashboard';
+import Reportitem from '../screens/Reportitem';
+import Admindashboard from '../screens/Admindashboard';
 import Colors from '../styles/Colors';
-import {StyleSheet} from 'react-native';
+import {useSelector} from 'react-redux';
 import {
   responsiveFontSize,
   responsiveHeight,
-  responsiveWidth,
 } from 'react-native-responsive-dimensions';
-import Reportitem from '../screens/Reportitem';
-import Admindashboard from '../screens/Admindashboard';
-import Profile from '../screens/Profile';
 
 const Tab = createBottomTabNavigator();
 
 const BottomTab = () => {
+  const {user} = useSelector(state => state.Auth);
+  const isAdmin = user?.role === 'admin';
+
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
@@ -41,17 +42,21 @@ const BottomTab = () => {
               ? 'shield-checkmark'
               : 'shield-checkmark-outline';
           }
-          // else if (route.name === 'My Profile') {
-          //   iconName = focused ? 'person-circle' : 'person-circle-outline';
-          // }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}>
-      <Tab.Screen name="Dashboard" component={Dashboard} />
-      <Tab.Screen name="AddItem" component={Reportitem} />
-      <Tab.Screen name="AdminDashboard" component={Admindashboard} />
-      {/* <Tab.Screen name="My Profile" component={Profile} /> */}
+      {isAdmin ? (
+        <>
+          <Tab.Screen name="AdminDashboard" component={Admindashboard} />
+          <Tab.Screen name="AddItem" component={Reportitem} />
+        </>
+      ) : (
+        <>
+          <Tab.Screen name="Dashboard" component={Dashboard} />
+          <Tab.Screen name="AddItem" component={Reportitem} />
+        </>
+      )}
     </Tab.Navigator>
   );
 };

@@ -23,6 +23,7 @@ const Onboarding = () => {
           flex: 1,
           justifyContent: 'space-around',
           alignItems: 'center',
+          paddingVertical: responsiveWidth(5),
         }}>
         <AuthHeader />
 

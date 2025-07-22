@@ -23,6 +23,7 @@ import MyTextInput from '../components/TextInputComponent';
 import TextInputDropdown from '../components/Dropdown';
 import ItemCard from '../components/ItemCard';
 import {lostItems} from '../data/LostItems';
+import {useSelector} from 'react-redux';
 
 const Dashboard = () => {
   const navigation = useNavigation();
@@ -31,6 +32,9 @@ const Dashboard = () => {
   const [statusFilter, setStatusFilter] = useState('All Items');
   const [filteredData, setFilteredData] = useState(lostItems);
   const [openDropdown, setOpenDropdown] = useState(null);
+
+  const {user} = useSelector(state => state.Auth);
+  console.log('User in Dashboard:', user);
 
   useEffect(() => {
     const lowerSearch = searchText.toLowerCase();
@@ -98,7 +102,7 @@ const Dashboard = () => {
         ListHeaderComponent={
           <View style={styles.searchSection}>
             <MyTextInput
-              placeholder={'Search for items by their names or categories'}
+              placeholder={'Search for items by their names '}
               placeholderTextColor={Colors.gray}
               LeftView={<Icon name="search" size={20} color={Colors.gray} />}
               value={searchText}

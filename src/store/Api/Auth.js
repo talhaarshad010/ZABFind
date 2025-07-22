@@ -5,6 +5,14 @@ export const Auth = createApi({
   reducerPath: 'Authentication',
   baseQuery: fetchBaseQuery({
     baseUrl: BaseUrl,
+    prepareHeaders: (headers, {getState}) => {
+      const token = getState().Auth.token;
+      console.log('Token in Auth API:', token);
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   endpoints: builder => ({
     signUp: builder.mutation({
@@ -21,7 +29,18 @@ export const Auth = createApi({
         body: credentials,
       }),
     }),
+    completeProfile: builder.mutation({
+      query: profileData => ({
+        url: '/student/complete-profile',
+        method: 'PUT',
+        body: profileData,
+      }),
+    }),
   }),
 });
 
-export const {useSignInMutation, useSignUpMutation} = Auth;
+export const {
+  useSignInMutation,
+  useSignUpMutation,
+  useCompleteProfileMutation,
+} = Auth;

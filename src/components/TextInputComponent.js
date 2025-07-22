@@ -9,64 +9,6 @@ import {
 import Feather from 'react-native-vector-icons/Feather';
 import MyText from './textcomponent';
 
-// const MyTextInput = ({
-//   inputStyle = {},
-//   textStyle = {},
-//   placeholder,
-//   onChangeText,
-//   value,
-//   placeholderTextColor = Colors.gray,
-//   RightView = false,
-//   LeftView = null,
-//   props,
-//   fieldName,
-// }) => {
-//   const [isPasswordVisible, setPasswordVisible] = useState(false);
-
-//   return (
-//     <View>
-//       {fieldName && (
-//         <MyText
-//           color={Colors.black}
-//           fontWeight="500"
-//           fontSize={responsiveFontSize(2.2)}
-//           text={fieldName}
-//           textStyle={styles.fieldName}
-//         />
-//       )}
-
-//       <View style={[styles.inputContainer, inputStyle]}>
-//         <View style={styles.inputInner}>
-//           {LeftView && <View>{LeftView}</View>}
-//           <TextInput
-//             allowFontScaling={false}
-//             secureTextEntry={RightView && !isPasswordVisible}
-//             cursorColor={Colors.black}
-//             placeholder={placeholder}
-//             onChangeText={onChangeText}
-//             value={value}
-//             placeholderTextColor={placeholderTextColor}
-//             style={[styles.textInput, textStyle]}
-//             {...props}
-//           />
-//         </View>
-
-//         {RightView && (
-//           <TouchableOpacity
-//             style={{padding: responsiveWidth(2)}}
-//             onPress={() => setPasswordVisible(!isPasswordVisible)}>
-//             <Feather
-//               name={isPasswordVisible ? 'eye' : 'eye-off'}
-//               size={20}
-//               color={Colors.black}
-//             />
-//           </TouchableOpacity>
-//         )}
-//       </View>
-//     </View>
-//   );
-// };
-
 const MyTextInput = ({
   inputStyle = {},
   textStyle = {},
@@ -76,9 +18,9 @@ const MyTextInput = ({
   placeholderTextColor = Colors.gray,
   RightView = false,
   LeftView = null,
-  multiline = false, // add this line
+  multiline = false,
   fieldName,
-  ...rest // use rest for spreading other props
+  ...rest
 }) => {
   const [isPasswordVisible, setPasswordVisible] = useState(false);
 
@@ -97,7 +39,7 @@ const MyTextInput = ({
       <View
         style={[
           styles.inputContainer,
-          multiline && styles.multilineContainer, // conditionally apply multiline style
+          multiline && styles.multilineContainer,
           inputStyle,
         ]}>
         <View
@@ -123,7 +65,7 @@ const MyTextInput = ({
 
         {RightView && !multiline && (
           <TouchableOpacity
-            style={{padding: responsiveWidth(2)}}
+            // style={{padding: responsiveWidth(2)}}
             onPress={() => setPasswordVisible(!isPasswordVisible)}>
             <Feather
               name={isPasswordVisible ? 'eye' : 'eye-off'}
@@ -152,9 +94,8 @@ const styles = StyleSheet.create({
     borderWidth: responsiveWidth(0.4),
   },
   inputInner: {
-    width: responsiveWidth(80),
+    width: responsiveWidth(70),
     flexDirection: 'row',
-    // justifyContent: 'space-between',
     alignItems: 'center',
   },
   textInput: {
@@ -162,6 +103,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.black,
     fontSize: responsiveFontSize(1.7),
+    // backgroundColor: 'red',
   },
   fieldName: {
     fontWeight: '500',

@@ -1,6 +1,6 @@
 import React from 'react';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
-import {Image, StyleSheet, View, TouchableOpacity} from 'react-native';
+import {Image, StyleSheet, View, TouchableOpacity, Text} from 'react-native';
 import {
   responsiveFontSize,
   responsiveHeight,
@@ -12,10 +12,12 @@ import WrapperContainer from './WrapperContainer';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import InfoComponent from './InfoComponent';
 import {useNavigation} from '@react-navigation/native';
+import {useDispatch} from 'react-redux';
+import {clearAuth} from '../store/slices/Auth';
 
 const CustomDrawerContent = props => {
   const navigation = useNavigation();
-
+  const dispatch = useDispatch();
   const infoData = [
     {label: 'Full Name', value: 'Talha Arshad'},
     {label: 'Student ID', value: 'BCS-123456'},
@@ -38,6 +40,12 @@ const CustomDrawerContent = props => {
                 }}
                 style={styles.profileImage}
               />
+              <Text
+                onPress={() => {
+                  dispatch(clearAuth());
+                }}>
+                Logout
+              </Text>
               <TouchableOpacity
                 onPress={() => {
                   navigation.navigate('MyProfile');
