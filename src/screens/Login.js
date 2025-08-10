@@ -23,7 +23,7 @@ import {
 import MyButton from '../components/CustomButton';
 import {useNavigation} from '@react-navigation/native';
 import {useSignInMutation} from '../store/Api/Auth';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {setAuth} from '../store/slices/Auth';
 import ToastMessage from '../hooks/ToastMessage';
 
@@ -36,13 +36,14 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const {Toasts} = ToastMessage();
+  const {user} = useSelector(state => state.Auth);
 
   const handleLogin = async () => {
     try {
       const result = await signIn({emailAddress: email, password}).unwrap();
+      console.log('responce from login: ', result);
 
-      dispatch(setAuth({token: result.token, user: result.user}));
-
+      await dispatch(setAuth({token: result.token, user: result.user}));
       Toasts(
         'Login Successful',
         `Welcome back, ${result.user.fullName}!`,
@@ -50,7 +51,7 @@ const Login = () => {
         3000,
       );
 
-      navigation.navigate('CompleteProfile');
+      // navigation.navigate('CompleteProfile');
     } catch (err) {
       const errorMessage =
         err?.data?.message || 'Something went wrong. Please try again.';

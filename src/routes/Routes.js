@@ -29,9 +29,14 @@ import {useSelector} from 'react-redux';
 
 const Routes = () => {
   const token = useSelector(state => state?.Auth?.token);
+  const {user} = useSelector(state => state.Auth);
+  console.log('User in main Route:', user);
   const isProfileComplete = useSelector(
     state => state?.Auth?.isProfileComplete,
   );
+  console.log('Token in main Route: ', token);
+
+  console.log('Profile complete in main Route: ', isProfileComplete);
 
   return (
     <NavigationContainer>
@@ -40,7 +45,7 @@ const Routes = () => {
         isProfileComplete ? (
           <StackRoute />
         ) : (
-          <AuthStack initialRouteName="CompleteProfile" />
+          <AuthStack />
         )
       ) : (
         <AuthStack />

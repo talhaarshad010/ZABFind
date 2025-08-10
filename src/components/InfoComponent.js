@@ -9,8 +9,11 @@ import Colors from '../styles/Colors';
 import MyText from './textcomponent';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
 const InfoComponent = ({info}) => {
   const navigation = useNavigation();
+  const {user} = useSelector(state => state.Auth);
+  console.log('User in Drawer InfoComponent:', user);
   return (
     <View style={styles.infoBox}>
       <View

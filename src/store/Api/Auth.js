@@ -29,11 +29,53 @@ export const Auth = createApi({
         body: credentials,
       }),
     }),
+    forgotPassword: builder.mutation({
+      query: emailAddress => ({
+        url: '/common/forgot-password',
+        method: 'POST',
+        body: {emailAddress},
+      }),
+    }),
+    verifyOtp: builder.mutation({
+      query: ({email, otp}) => ({
+        url: '/common/verify-otp',
+        method: 'POST',
+        body: {email, otp},
+      }),
+    }),
+    resetPassword: builder.mutation({
+      query: ({email, otp, newPassword}) => ({
+        url: '/common/reset-password',
+        method: 'POST',
+        body: {email, otp, newPassword},
+      }),
+    }),
+
     completeProfile: builder.mutation({
       query: profileData => ({
         url: '/student/complete-profile',
         method: 'PUT',
         body: profileData,
+      }),
+    }),
+    getStudentById: builder.query({
+      query: id => ({
+        url: `/student/${id}`,
+        method: 'GET',
+      }),
+    }),
+    updateProfile: builder.mutation({
+      query: formData => ({
+        url: '/student/update-profile',
+        method: 'PUT',
+        body: formData,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    getLostFoundItems: builder.query({
+      query: () => ({
+        url: '/common/get-items',
+        method: 'GET',
       }),
     }),
   }),
@@ -42,5 +84,11 @@ export const Auth = createApi({
 export const {
   useSignInMutation,
   useSignUpMutation,
+  useForgotPasswordMutation,
+  useVerifyOtpMutation,
+  useResetPasswordMutation,
   useCompleteProfileMutation,
+  useGetStudentByIdQuery,
+  useUpdateProfileMutation,
+  useGetLostFoundItemsQuery,
 } = Auth;

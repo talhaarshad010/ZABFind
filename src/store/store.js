@@ -3,6 +3,7 @@ import Reducers from './slices';
 import {MMKV} from 'react-native-mmkv';
 import {persistReducer, persistStore} from 'redux-persist';
 import {Auth} from './Api/Auth';
+import {ItemReports} from './Api/addItemReport';
 
 const storage = new MMKV();
 
@@ -36,7 +37,7 @@ export const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(Auth.middleware),
+    }).concat(Auth.middleware, ItemReports.middleware),
 });
 
 export const persistore = persistStore(store);

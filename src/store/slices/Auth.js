@@ -37,7 +37,7 @@ const authSlice = createSlice({
     setAuth: (state, action) => {
       state.token = action.payload.token;
       state.user = action.payload.user;
-      state.isProfileComplete = !!action.payload.user?.gender; // or whatever field indicates completeness
+      state.isProfileComplete = !!action.payload.user?.isProfileComplete; // or whatever field indicates completeness
     },
     updateUserProfile: (state, action) => {
       state.user = {
@@ -49,7 +49,7 @@ const authSlice = createSlice({
     clearAuth: state => {
       state.token = null;
       state.user = null;
-      state.isProfileComplete = false;
+      // state.isProfileComplete = false;
     },
   },
 });
