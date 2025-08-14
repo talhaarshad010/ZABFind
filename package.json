@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@react-native-community/datetimepicker": "react-native-community/datetimepicker",
+    "@react-native-firebase/app": "^23.0.1",
+    "@react-native-firebase/messaging": "^23.0.1",
     "@react-navigation/bottom-tabs": "^7.3.14",
     "@react-navigation/drawer": "^7.4.1",
     "@react-navigation/native": "^7.1.10",

@@ -50,8 +50,9 @@ const Login = () => {
         'success',
         3000,
       );
-
-      // navigation.navigate('CompleteProfile');
+      if (!result.isProfileComplete) {
+        navigation.navigate('CompleteProfile');
+      }
     } catch (err) {
       const errorMessage =
         err?.data?.message || 'Something went wrong. Please try again.';

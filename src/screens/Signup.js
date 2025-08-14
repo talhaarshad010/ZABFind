@@ -24,6 +24,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useSignUpMutation} from '../store/Api/Auth';
 import {checkMinLength, validateEmail} from '../utils/validations';
 import ToastMessage from '../hooks/ToastMessage';
+import messaging from '@react-native-firebase/messaging';
 
 const Signup = () => {
   const [rememberMe, setRememberMe] = useState(false);
@@ -77,12 +78,27 @@ const Signup = () => {
         );
       }
 
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      let fcmToken = null;
+      if (enabled) {
+        // ✅ 2. Get FCM token
+        fcmToken = await messaging().getToken();
+        console.log('FCM Token:', fcmToken);
+      } else {
+        console.log('Notification permission not granted');
+      }
+
       const payload = {
         fullName: trimmedFullName,
         emailAddress: trimmedEmail,
         studentId: trimmedStudentId,
         password: trimmedPassword,
         confirmPassword: trimmedConfirmPassword,
+        fcmToken,
       };
 
       console.log('Signup payload:', payload);

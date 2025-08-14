@@ -22,6 +22,12 @@ export const ItemReports = createApi({
         body: credentials,
       }),
     }),
+    stats: builder.query({
+      query: () => ({
+        url: '/student/stats',
+        method: 'GET',
+      }),
+    }),
   }),
 });
 

@@ -10,9 +10,11 @@ import ForgetPassword from '../screens/Forgetpassword';
 import CompleteProfile from '../screens/Completeprofile';
 
 const Stack = createNativeStackNavigator();
-const AuthStack = () => {
+const AuthStack = ({initialRouteName = 'OnBoarding'}) => {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator
+      screenOptions={{headerShown: false}}
+      initialRouteName={initialRouteName}>
       <Stack.Screen name="OnBoarding" component={Onboarding} />
       <Stack.Screen name="SignUp" component={Signup} />
       <Stack.Screen name="LogIn" component={Login} />

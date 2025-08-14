@@ -19,12 +19,44 @@ const ItemCard = ({
   status,
   highlight,
   category, // <-- added category
+  studentId,
+  emailAddress,
+  phoneNumber,
 }) => {
   const navigation = useNavigation();
+
+  console.log('All Data:', {
+    imageUri,
+    title,
+    description,
+    location,
+    date,
+    username,
+    status,
+    highlight,
+    category,
+    studentId,
+    emailAddress,
+    phoneNumber,
+  });
+  let itemDetails = {
+    imageUri,
+    title,
+    description,
+    location,
+    date,
+    username,
+    status,
+    highlight,
+    category,
+    studentId,
+    emailAddress,
+    phoneNumber,
+  };
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('ViewDetails');
+        navigation.navigate('ViewDetails', itemDetails);
       }}
       style={styles.card}>
       <Image source={{uri: imageUri}} style={styles.image} />

@@ -11,12 +11,41 @@ import {
 } from 'react-native-responsive-dimensions';
 import MyText from '../components/textcomponent';
 import MyButton from '../components/CustomButton';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 const Viewdetails = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const [imageModalVisible, setImageModalVisible] = useState(false);
+  const {
+    imageUri,
+    title,
+    description,
+    location,
+    date,
+    username,
+    status,
+    highlight,
+    category,
+    studentId,
+    emailAddress,
+    phoneNumber,
+  } = route.params || {};
 
+  console.log('Item Details in view details:', {
+    imageUri,
+    title,
+    description,
+    location,
+    date,
+    username,
+    status,
+    highlight,
+    category,
+    studentId,
+    emailAddress,
+    phoneNumber,
+  });
   const item = {
     name: 'Lost Wallet',
     imageUri:
@@ -48,21 +77,21 @@ const Viewdetails = () => {
           <Pressable
             style={styles.modalContainer}
             onPress={() => setImageModalVisible(false)}>
-            <Image source={{uri: item.imageUri}} style={styles.modalImage} />
+            <Image source={{uri: imageUri}} style={styles.modalImage} />
           </Pressable>
         </Modal>
 
         {/* Item Info Box */}
         <View style={styles.box}>
           <MyText
-            text={item.name}
+            text={title}
             fontSize={responsiveFontSize(3)}
             fontWeight="700"
             style={{marginBottom: responsiveHeight(1.5)}}
           />
 
           <Pressable onPress={() => setImageModalVisible(true)}>
-            <Image source={{uri: item.imageUri}} style={styles.itemImage} />
+            <Image source={{uri: imageUri}} style={styles.itemImage} />
           </Pressable>
 
           <MyText
@@ -70,17 +99,17 @@ const Viewdetails = () => {
             fontWeight="bold"
             style={styles.labelText}
           />
-          <MyText text={item.description} style={styles.infoText} />
+          <MyText text={description} style={styles.infoText} />
 
           <MyText text="Last Seen" fontWeight="bold" style={styles.labelText} />
-          <MyText text={item.location} style={styles.infoText} />
+          <MyText text={location} style={styles.infoText} />
 
           <MyText
             text="Date Reported"
             fontWeight="bold"
             style={styles.labelText}
           />
-          <MyText text={item.date} style={styles.infoText} />
+          <MyText text={date} style={styles.infoText} />
         </View>
 
         {/* Contact Info Box */}
@@ -91,15 +120,12 @@ const Viewdetails = () => {
             fontWeight="600"
             style={{marginBottom: 10}}
           />
-          <MyText text={`Name: ${item.username}`} style={styles.infoText} />
-          <MyText
-            text={`Student ID: ${item.studentId}`}
-            style={styles.infoText}
-          />
+          <MyText text={`Name: ${username}`} style={styles.infoText} />
+          <MyText text={`Student ID: ${studentId}`} style={styles.infoText} />
 
           <MyButton
             backgroundColor={Colors.primary}
-            onPress={() => Linking.openURL(`tel:${item.phone}`)}
+            onPress={() => Linking.openURL(`tel:${phoneNumber}`)}
             style={styles.iconButton}
             text={
               <View style={styles.iconRow}>
@@ -120,7 +146,7 @@ const Viewdetails = () => {
 
           <MyButton
             backgroundColor={'#16A34A'}
-            onPress={() => Linking.openURL(`mailto:${item.email}`)}
+            onPress={() => Linking.openURL(`mailto:${emailAddress}`)}
             style={[styles.iconButton, {marginTop: responsiveHeight(1.5)}]}
             text={
               <View style={styles.iconRow}>
