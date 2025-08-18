@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "400109533278",
-    "project_id": "zab-find",
-    "storage_bucket": "zab-find.firebasestorage.app"
+    "project_number": "945711861344",
+    "project_id": "zabfind",
+    "storage_bucket": "zabfind.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:400109533278:android:89da63e8a25dd442e0dccf",
+        "mobilesdk_app_id": "1:945711861344:android:b0b6ee7c4644a02d64bd05",
         "android_client_info": {
           "package_name": "com.zabfind"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDfQbln65hL4r8Wvs3oQNI36adDHAxdcwI"
+          "current_key": "AIzaSyC6HSKZmfecKq_alcH8r2EEniDS4RxFMyE"
         }
       ],
       "services": {

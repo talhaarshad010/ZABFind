@@ -3,6 +3,7 @@ import Viewdetails from '../screens/Viewdetails';
 import MyDrawer from './drawer';
 import Reportitem from '../screens/Reportitem';
 import Profile from '../screens/Profile';
+import ConfirmationScreen from '../screens/ConfirmationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -12,6 +13,7 @@ const StackRoute = () => {
       <Stack.Screen name="MyDrawer" component={MyDrawer} />
       <Stack.Screen name="ViewDetails" component={Viewdetails} />
       <Stack.Screen name="ReportItem" component={Reportitem} />
+      <Stack.Screen name="ConfirmationScreen" component={ConfirmationScreen} />
       <Stack.Screen name="MyProfile" component={Profile} />
     </Stack.Navigator>
   );
