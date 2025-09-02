@@ -8,7 +8,7 @@ import {
   Platform,
   StatusBar, // import is optional now, just for safety
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import MyText from '../components/textcomponent';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Colors from '../styles/Colors';
@@ -26,6 +26,14 @@ import {useSignInMutation} from '../store/Api/Auth';
 import {useDispatch, useSelector} from 'react-redux';
 import {setAuth} from '../store/slices/Auth';
 import ToastMessage from '../hooks/ToastMessage';
+import {
+  requestNotificationPermission,
+  getFcmToken,
+} from '../config/firebaseConfig';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import {BaseUrl} from '../config/Urls';
+// import {BaseUrl} from '../config/firebaseConfig';
 
 const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
@@ -36,7 +44,38 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const {Toasts} = ToastMessage();
-  const {user} = useSelector(state => state.Auth);
+  // const usertoken = useSelector(state => state.Auth.token);
+
+  // const updateFcmToken = async () => {
+  //   const hasPermission = await requestNotificationPermission();
+  //   if (hasPermission) {
+  //     const token = await getFcmToken();
+  //     console.log('Token==>', token);
+  //     console.log('usertoken==>', usertoken);
+  //     if (token) {
+  //       try {
+  //         // const userToken = await AsyncStorage.getItem('userToken'); // Assuming you store JWT token
+  //         await axios.post(
+  //           `${BaseUrl}/common/update-fcm-token`,
+  //           {fcmToken: token}, // <-- send token in body
+  //           {
+  //             headers: {
+  //               Authorization: `Bearer ${usertoken}`,
+  //             },
+  //           },
+  //         );
+  //         console.log('FCM token sent to backend');
+  //       } catch (error) {
+  //         console.error('Error updating FCM token:', error);
+  //       }
+  //     }
+  //   }
+  // };
+
+  // // Call this function after login or app initialization
+  // useEffect(() => {
+  //   updateFcmToken();
+  // }, []);
 
   const handleLogin = async () => {
     try {

@@ -17,7 +17,7 @@ export const ItemReports = createApi({
   endpoints: builder => ({
     AddReport: builder.mutation({
       query: credentials => ({
-        url: '/student/report-item',
+        url: '/common/report-item',
         method: 'POST',
         body: credentials,
       }),

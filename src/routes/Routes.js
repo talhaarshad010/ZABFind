@@ -37,7 +37,7 @@ const Routes = () => {
   console.log('Profile complete in main Route: ', isProfileComplete);
 
   return (
-    <NavigationContainer>
+    <>
       <StatusBar hidden={true} />
       {token ? (
         isProfileComplete ? (
@@ -48,7 +48,7 @@ const Routes = () => {
       ) : (
         <AuthStack />
       )}
-    </NavigationContainer>
+    </>
   );
 };
 
