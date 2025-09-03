@@ -11,7 +11,7 @@ const NotificationHandler = () => {
       console.log('Foreground Notification:', remoteMessage);
       // Display a local notification (optional)
       // You can also navigate directly
-      navigation.navigate('Viewdetails', {
+      navigation.navigate('ViewDetails', {
         imageUri: remoteMessage.data.imageUri,
         title: remoteMessage.data.title,
         description: remoteMessage.data.description,

@@ -21,7 +21,7 @@ const BottomTab = () => {
     <Tab.Navigator
       screenOptions={({route}) => ({
         tabBarStyle: {
-          height: responsiveHeight(9),
+          height: responsiveHeight(7),
         },
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.grayInput,

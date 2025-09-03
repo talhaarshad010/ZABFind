@@ -38,7 +38,7 @@ const Routes = () => {
 
   return (
     <>
-      <StatusBar hidden={true} />
+      <StatusBar hidden={false} />
       {token ? (
         isProfileComplete ? (
           <StackRoute />

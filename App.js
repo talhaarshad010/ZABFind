@@ -147,8 +147,8 @@ const setupBackgroundNotifications = navigation => {
       'Notification caused app to open from background:',
       remoteMessage,
     );
-    if (navigation && remoteMessage?.data?.screen === 'Viewdetails') {
-      navigation.navigate('Viewdetails', {
+    if (navigation && remoteMessage?.data?.screen === 'ViewDetails') {
+      navigation.navigate('ViewDetails', {
         imageUri: remoteMessage.data.imageUri,
         title: remoteMessage.data.title,
         description: remoteMessage.data.description,
@@ -167,13 +167,13 @@ const setupBackgroundNotifications = navigation => {
       if (
         remoteMessage &&
         navigation &&
-        remoteMessage?.data?.screen === 'Viewdetails'
+        remoteMessage?.data?.screen === 'ViewDetails'
       ) {
         console.log(
           'Notification caused app to open from quit state:',
           remoteMessage,
         );
-        navigation.navigate('Viewdetails', {
+        navigation.navigate('ViewDetails', {
           imageUri: remoteMessage.data.imageUri,
           title: remoteMessage.data.title,
           description: remoteMessage.data.description,
