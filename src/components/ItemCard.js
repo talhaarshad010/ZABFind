@@ -10,6 +10,7 @@ import HighlightedText from './HighlightedText';
 import {useNavigation} from '@react-navigation/native';
 
 const ItemCard = ({
+  itemId,
   imageUri,
   title,
   description,
@@ -20,12 +21,14 @@ const ItemCard = ({
   highlight,
   category, // <-- added category
   studentId,
+  studentBackId,
   emailAddress,
   phoneNumber,
 }) => {
   const navigation = useNavigation();
 
   console.log('All Data:', {
+    itemId,
     imageUri,
     title,
     description,
@@ -36,10 +39,12 @@ const ItemCard = ({
     highlight,
     category,
     studentId,
+    studentBackId,
     emailAddress,
     phoneNumber,
   });
   let itemDetails = {
+    itemId,
     imageUri,
     title,
     description,
@@ -50,6 +55,7 @@ const ItemCard = ({
     highlight,
     category,
     studentId,
+    studentBackId,
     emailAddress,
     phoneNumber,
   };

@@ -107,9 +107,10 @@ const Dashboard = () => {
         return matchesSearch && matchesCategory && matchesStatus;
       })
       .map(item => ({
-        id: item._id,
+        itemId: item._id,
         imageUri: item.image || 'https://via.placeholder.com/150',
         studentId: item.reportedBy?.studentId,
+        studentBackId: item.reportedBy?._id,
         emailAddress: item.reportedBy?.email,
         phoneNumber: item.reportedBy?.phoneNumber,
         title: item.title,
@@ -181,7 +182,7 @@ const Dashboard = () => {
       <FlatList
         showsVerticalScrollIndicator={false}
         data={filteredData}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={item => item.itemId.toString()}
         contentContainerStyle={styles.scrollContainer}
         refreshing={refreshing}
         onRefresh={onRefresh}
@@ -247,6 +248,7 @@ const Dashboard = () => {
           console.log('item in flat list:', item),
           (
             <ItemCard
+              itemId={item.itemId}
               imageUri={item.imageUri}
               title={item.title}
               description={item.description}
@@ -257,6 +259,7 @@ const Dashboard = () => {
               status={item.status}
               highlight={searchText}
               studentId={item.studentId}
+              studentBackId={item.studentBackId}
               emailAddress={item.emailAddress}
               phoneNumber={item.phoneNumber}
             />

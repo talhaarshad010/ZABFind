@@ -2,3 +2,4 @@
 // export const BaseUrl = 'http://localhost:5000/api';
 // export const BaseUrl = 'http://192.168.18.14:5000/api';
 export const BaseUrl = 'http://192.168.0.117:5000/api';
+export const SocketUrl = 'http://192.168.0.117:5000';

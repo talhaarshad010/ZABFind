@@ -4,6 +4,7 @@ import MyDrawer from './drawer';
 import Reportitem from '../screens/Reportitem';
 import Profile from '../screens/Profile';
 import ConfirmationScreen from '../screens/ConfirmationScreen';
+import ChatScreen from '../screens/ChatScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ const StackRoute = () => {
       <Stack.Screen name="ReportItem" component={Reportitem} />
       <Stack.Screen name="ConfirmationScreen" component={ConfirmationScreen} />
       <Stack.Screen name="MyProfile" component={Profile} />
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
     </Stack.Navigator>
   );
 };

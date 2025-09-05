@@ -1,4 +1,12 @@
-import {Image, StyleSheet, View, Linking, Modal, Pressable} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  View,
+  Linking,
+  Modal,
+  Pressable,
+  ScrollView,
+} from 'react-native';
 import React, {useState} from 'react';
 import WrapperContainer from '../components/WrapperContainer';
 import MyHeader from '../components/Header';
@@ -18,6 +26,7 @@ const Viewdetails = () => {
   const route = useRoute();
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const {
+    itemId,
     imageUri,
     title,
     description,
@@ -30,9 +39,11 @@ const Viewdetails = () => {
     studentId,
     emailAddress,
     phoneNumber,
+    studentBackId,
   } = route.params || {};
 
   console.log('Item Details in view details:', {
+    itemId,
     imageUri,
     title,
     description,
@@ -43,6 +54,7 @@ const Viewdetails = () => {
     highlight,
     category,
     studentId,
+    studentBackId,
     emailAddress,
     phoneNumber,
   });
@@ -58,102 +70,126 @@ const Viewdetails = () => {
         }
         onPressleft={() => navigation.goBack()}
       />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{flex: 1, marginBottom: responsiveHeight(2)}}>
+        <View style={styles.container}>
+          {/* Image Zoom Modal */}
+          <Modal visible={imageModalVisible} transparent={true}>
+            <Pressable
+              style={styles.modalContainer}
+              onPress={() => setImageModalVisible(false)}>
+              <Image source={{uri: imageUri}} style={styles.modalImage} />
+            </Pressable>
+          </Modal>
 
-      <View style={styles.container}>
-        {/* Image Zoom Modal */}
-        <Modal visible={imageModalVisible} transparent={true}>
-          <Pressable
-            style={styles.modalContainer}
-            onPress={() => setImageModalVisible(false)}>
-            <Image source={{uri: imageUri}} style={styles.modalImage} />
-          </Pressable>
-        </Modal>
+          {/* Item Info Box */}
+          <View style={styles.box}>
+            <MyText
+              text={title}
+              fontSize={responsiveFontSize(3)}
+              fontWeight="700"
+              style={{marginBottom: responsiveHeight(1.5)}}
+            />
 
-        {/* Item Info Box */}
-        <View style={styles.box}>
-          <MyText
-            text={title}
-            fontSize={responsiveFontSize(3)}
-            fontWeight="700"
-            style={{marginBottom: responsiveHeight(1.5)}}
-          />
+            <Pressable onPress={() => setImageModalVisible(true)}>
+              <Image source={{uri: imageUri}} style={styles.itemImage} />
+            </Pressable>
 
-          <Pressable onPress={() => setImageModalVisible(true)}>
-            <Image source={{uri: imageUri}} style={styles.itemImage} />
-          </Pressable>
+            <MyText
+              text="Description"
+              fontWeight="bold"
+              style={styles.labelText}
+            />
+            <MyText text={description} style={styles.infoText} />
 
-          <MyText
-            text="Description"
-            fontWeight="bold"
-            style={styles.labelText}
-          />
-          <MyText text={description} style={styles.infoText} />
+            <MyText
+              text="Last Seen"
+              fontWeight="bold"
+              style={styles.labelText}
+            />
+            <MyText text={location} style={styles.infoText} />
 
-          <MyText text="Last Seen" fontWeight="bold" style={styles.labelText} />
-          <MyText text={location} style={styles.infoText} />
+            <MyText
+              text="Date Reported"
+              fontWeight="bold"
+              style={styles.labelText}
+            />
+            <MyText text={date} style={styles.infoText} />
+          </View>
 
-          <MyText
-            text="Date Reported"
-            fontWeight="bold"
-            style={styles.labelText}
-          />
-          <MyText text={date} style={styles.infoText} />
+          {/* Contact Info Box */}
+          <View style={styles.box}>
+            <MyText
+              text="Contact Information"
+              fontSize={responsiveFontSize(2.5)}
+              fontWeight="600"
+              style={{marginBottom: 10}}
+            />
+            <MyText text={`Name: ${username}`} style={styles.infoText} />
+            <MyText text={`Student ID: ${studentId}`} style={styles.infoText} />
+
+            <MyButton
+              backgroundColor={Colors.primary}
+              onPress={() => Linking.openURL(`tel:${phoneNumber}`)}
+              style={styles.iconButton}
+              text={
+                <View style={styles.iconRow}>
+                  <Icon
+                    name="phone"
+                    size={20}
+                    color={Colors.white}
+                    style={{marginRight: 8}}
+                  />
+                  <MyText
+                    text="Call Now"
+                    color={Colors.white}
+                    fontWeight="bold"
+                  />
+                </View>
+              }
+            />
+
+            <MyButton
+              backgroundColor={'#16A34A'}
+              onPress={() => Linking.openURL(`mailto:${emailAddress}`)}
+              style={[styles.iconButton, {marginTop: responsiveHeight(1.5)}]}
+              text={
+                <View style={styles.iconRow}>
+                  <Icon
+                    name="mail"
+                    size={20}
+                    color={Colors.white}
+                    style={{marginRight: 8}}
+                  />
+                  <MyText
+                    text="Send Email"
+                    color={Colors.white}
+                    fontWeight="bold"
+                  />
+                </View>
+              }
+            />
+            <MyButton
+              onPress={() =>
+                navigation.navigate('ChatScreen', {
+                  itemId: route.params.itemId,
+                  receiverId: studentBackId,
+                  receiverName: username,
+                })
+              }
+              text="Message"
+              backgroundColor={Colors.primary}
+              style={[
+                styles.iconButton,
+                {
+                  marginTop: responsiveHeight(1.5),
+                },
+              ]}
+            />
+          </View>
         </View>
-
-        {/* Contact Info Box */}
-        <View style={styles.box}>
-          <MyText
-            text="Contact Information"
-            fontSize={responsiveFontSize(2.5)}
-            fontWeight="600"
-            style={{marginBottom: 10}}
-          />
-          <MyText text={`Name: ${username}`} style={styles.infoText} />
-          <MyText text={`Student ID: ${studentId}`} style={styles.infoText} />
-
-          <MyButton
-            backgroundColor={Colors.primary}
-            onPress={() => Linking.openURL(`tel:${phoneNumber}`)}
-            style={styles.iconButton}
-            text={
-              <View style={styles.iconRow}>
-                <Icon
-                  name="phone"
-                  size={20}
-                  color={Colors.white}
-                  style={{marginRight: 8}}
-                />
-                <MyText
-                  text="Call Now"
-                  color={Colors.white}
-                  fontWeight="bold"
-                />
-              </View>
-            }
-          />
-
-          <MyButton
-            backgroundColor={'#16A34A'}
-            onPress={() => Linking.openURL(`mailto:${emailAddress}`)}
-            style={[styles.iconButton, {marginTop: responsiveHeight(1.5)}]}
-            text={
-              <View style={styles.iconRow}>
-                <Icon
-                  name="mail"
-                  size={20}
-                  color={Colors.white}
-                  style={{marginRight: 8}}
-                />
-                <MyText
-                  text="Send Email"
-                  color={Colors.white}
-                  fontWeight="bold"
-                />
-              </View>
-            }
-          />
-        </View>
-      </View>
+      </ScrollView>
     </WrapperContainer>
   );
 };

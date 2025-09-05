@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import messagesIcon from 'react-native-vector-icons/AntDesign';
 import Dashboard from '../screens/Dashboard';
 import Reportitem from '../screens/Reportitem';
 import Admindashboard from '../screens/Admindashboard';
@@ -10,6 +11,7 @@ import {
   responsiveFontSize,
   responsiveHeight,
 } from 'react-native-responsive-dimensions';
+import Messages from '../screens/Messages';
 
 const Tab = createBottomTabNavigator();
 
@@ -37,24 +39,32 @@ const BottomTab = () => {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'AddItem') {
             iconName = focused ? 'add-circle' : 'add-circle-outline';
+          } else if (route.name === 'Messages') {
+            iconName = focused ? 'chat' : 'chat-outline';
           } else if (route.name === 'AdminDashboard') {
             iconName = focused
               ? 'shield-checkmark'
               : 'shield-checkmark-outline';
           }
 
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return iconName === 'Messages' ? (
+            <messagesIcon name={iconName} size={size} color={color} />
+          ) : (
+            <Ionicons name={iconName} size={size} color={color} />
+          );
         },
       })}>
       {isAdmin ? (
         <>
           <Tab.Screen name="AdminDashboard" component={Admindashboard} />
           <Tab.Screen name="AddItem" component={Reportitem} />
+          <Tab.Screen name="Messages" component={Messages} />
         </>
       ) : (
         <>
           <Tab.Screen name="Dashboard" component={Dashboard} />
           <Tab.Screen name="AddItem" component={Reportitem} />
+          <Tab.Screen name="Messages" component={Messages} />
         </>
       )}
     </Tab.Navigator>
