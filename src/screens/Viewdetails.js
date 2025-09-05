@@ -46,18 +46,6 @@ const Viewdetails = () => {
     emailAddress,
     phoneNumber,
   });
-  const item = {
-    name: 'Lost Wallet',
-    imageUri:
-      'https://static1.howtogeekimages.com/wordpress/wp-content/uploads/2023/08/52421386363_8747a89956_o.jpg?q=50&fit=crop&w=1140&h=&dpr=1.5',
-    description: 'Black leather wallet with important cards.',
-    location: 'Library - Main Campus',
-    date: '2025-06-14',
-    username: 'Talha Arshad',
-    studentId: 'BSCS-12345',
-    phone: '03123456789',
-    email: 'talha@example.com',
-  };
 
   return (
     <WrapperContainer>

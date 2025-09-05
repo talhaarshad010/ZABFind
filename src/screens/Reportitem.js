@@ -82,12 +82,12 @@ const Reportitem = () => {
 
   const resetForm = () => {
     setItemName('');
-    setCategory('');
+    setCategory(null);
     setDescription('');
     setSelected('lost');
     setImageUri(null);
     setImageFile(null);
-    setLocation('');
+    setLocation(null);
     setContactInfo('');
   };
 
