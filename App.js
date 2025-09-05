@@ -245,23 +245,29 @@ import {BaseUrl} from './src/config/Urls';
 
 // 🔹 Update FCM token to backend
 const updateFcmToken = async userToken => {
+  console.log('user token in updateFcmToken', userToken);
   try {
     const hasPermission = await requestNotificationPermission();
     if (hasPermission) {
       const token = await getFcmToken();
+      console.log('Token==>', token);
       if (token && userToken) {
         await axios.post(
           `${BaseUrl}/common/update-fcm-token`,
           {fcmToken: token},
           {
-            headers: {Authorization: `Bearer ${userToken}`},
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
           },
         );
-        console.log('✅ FCM token sent to backend');
+        console.log('FCM token sent to backend');
+      } else {
+        console.warn('No FCM token or user token available');
       }
     }
   } catch (error) {
-    console.error('❌ Error updating FCM token:', error);
+    console.error('Error updating FCM token:', error);
   }
 };
 

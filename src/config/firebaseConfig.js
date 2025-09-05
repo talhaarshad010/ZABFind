@@ -47,3 +47,14 @@ export const requestNotificationPermission = async () => {
     return false;
   }
 };
+
+export const getFcmToken = async () => {
+  try {
+    const token = await messaging().getToken();
+    console.log('FCM Token:', token);
+    return token;
+  } catch (error) {
+    console.error('Error getting FCM token:', error);
+    return null;
+  }
+};
