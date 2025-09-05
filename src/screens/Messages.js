@@ -46,17 +46,21 @@ const Messages = () => {
               acc[chat.roomId] = {
                 roomId: chat.roomId,
                 receiverId:
-                  chat.senderId === user._id ? chat.receiverId : chat.senderId,
+                  chat.receiverId === user._id
+                    ? chat.receiverId
+                    : chat.senderId,
                 receiverName:
-                  chat.senderId === user._id ? 'Receiver Name' : 'Sender Name',
-                lastMessage: chat.message,
+                  chat.receiverId === user._id
+                    ? chat.receiverName
+                    : 'Guest User',
+                lastMessage: chat.lastMessage,
                 timestamp: chat.timestamp,
               };
             }
             return acc;
           }, {}),
         );
-
+        console.log('groupedChats', groupedChats);
         setChats(groupedChats);
       } catch (error) {
         console.error('Error fetching chats:', error);

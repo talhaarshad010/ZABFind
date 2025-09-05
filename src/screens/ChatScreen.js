@@ -65,6 +65,7 @@ const ChatScreen = () => {
 
     // Listen for incoming messages
     socket.on('receive_message', messageData => {
+      console.log('receive_message', messageData);
       setMessages(previousMessages =>
         GiftedChat.append(previousMessages, [
           {
