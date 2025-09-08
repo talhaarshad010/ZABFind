@@ -126,10 +126,6 @@ const NotificationHandler = () => {
 
 export default NotificationHandler;
 
-
-
-
-
 // import messaging from '@react-native-firebase/messaging';
 // import notifee, {AndroidImportance, EventType} from '@notifee/react-native';
 // import {useEffect} from 'react';
