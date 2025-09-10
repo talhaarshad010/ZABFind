@@ -30,7 +30,7 @@ const MyButton = ({
       disabled={isLoading}
       style={[styles.Container, {backgroundColor}, style]}>
       {isLoading ? (
-        <ActivityIndicator size={'small'} color={textColor} />
+        <ActivityIndicator size={'large'} color={textColor} />
       ) : (
         <MyText
           text={text}
