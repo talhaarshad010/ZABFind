@@ -1,8 +1,8 @@
 package com.zabfind
 
 import android.app.Activity
-import android.os.Bundle
 import android.content.Intent
+import android.os.Bundle
 import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.graphics.Color
@@ -13,84 +13,132 @@ import android.animation.AnimatorSet
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 
 class SplashActivity : Activity() {
 
+    private val TAG = "SplashActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.splash)
+        try {
+            setContentView(R.layout.splash)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting content view: ${e.message}")
+            proceedToMainActivity()
+            return
+        }
 
         val tvZab = findViewById<TextView>(R.id.tv_zab)
         val tvSub = findViewById<TextView>(R.id.tv_sub)
         val root = findViewById<ConstraintLayout>(R.id.root)
 
-        // Apply gradient to "ZAB" (horizontal from #0C54A3 to a lighter blue)
-        tvZab.paint.shader = LinearGradient(
-            0f, 0f, tvZab.paint.measureText(tvZab.text.toString()), 0f,
-            intArrayOf(Color.parseColor("#0C54A3"), Color.parseColor("#4A90E2")),
-            null, Shader.TileMode.CLAMP
-        )
+        if (tvZab == null || tvSub == null || root == null) {
+            Log.e(TAG, "One or more views are null: tvZab=$tvZab, tvSub=$tvSub, root=$root")
+            proceedToMainActivity()
+            return
+        }
 
-        // Apply gradient to "Lost & Find"
-        tvSub.paint.shader = LinearGradient(
-            0f, 0f, tvSub.paint.measureText(tvSub.text.toString()), 0f,
-            intArrayOf(Color.parseColor("#0C54A3"), Color.parseColor("#4A90E2")),
-            null, Shader.TileMode.CLAMP
-        )
+        // Apply gradient to "ZAB"
+        try {
+            tvZab.paint.shader = LinearGradient(
+                0f, 0f, tvZab.paint.measureText(tvZab.text.toString()), 0f,
+                intArrayOf(Color.parseColor("#0C54A3"), Color.parseColor("#4A90E2")),
+                null, Shader.TileMode.CLAMP
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error applying gradient to ZAB: ${e.message}")
+        }
+
+        // Apply gradient to "Lost & Fınd"
+        try {
+            tvSub.paint.shader = LinearGradient(
+                0f, 0f, tvSub.paint.measureText(tvSub.text.toString()), 0f,
+                intArrayOf(Color.parseColor("#0C54A3"), Color.parseColor("#4A90E2")),
+                null, Shader.TileMode.CLAMP
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error applying gradient to Lost & Fınd: ${e.message}")
+        }
 
         // Create the dot view
         val dot = View(this)
-        val params = ConstraintLayout.LayoutParams(20, 20) // Size of the dot
+        val params = ConstraintLayout.LayoutParams(20, 20)
         dot.layoutParams = params
-        dot.setBackgroundResource(R.drawable.dot)
-        dot.visibility = View.INVISIBLE // Hide until positions are calculated
+        try {
+            dot.setBackgroundResource(R.drawable.dot)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting dot background: ${e.message}")
+            proceedToMainActivity()
+            return
+        }
+        dot.visibility = View.INVISIBLE
         root.addView(dot)
 
-        // Calculate position after layout is drawn
+        // Calculate position after layout
         tvSub.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 tvSub.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
-                val text = tvSub.text.toString()
-                val findIndex = text.indexOf("Find")
-                if (findIndex == -1) return // Safety check
+                try {
+                    val text = tvSub.text.toString()
+                    val findIndex = text.indexOf("Fınd")
+                    if (findIndex == -1) {
+                        Log.e(TAG, "Text 'Fınd' not found, skipping dot animation")
+                        proceedToMainActivity()
+                        return
+                    }
 
-                val iIndex = findIndex + 1 // Position of 'i' in "Find"
-                val layout = tvSub.layout
-                val x = layout.getPrimaryHorizontal(iIndex)
-                val line = layout.getLineForOffset(iIndex)
-                val baseline = layout.getLineBaseline(line)
-                val ascent = tvSub.paint.fontMetrics.ascent // Negative value, used to position above 'i'
+                    val iIndex = findIndex + 1 // Position of 'ı' in "Fınd"
+                    val layout = tvSub.layout
+                    if (layout == null) {
+                        Log.e(TAG, "TextView layout is null, skipping animation")
+                        proceedToMainActivity()
+                        return
+                    }
 
-                // Target position for dot (centered above 'i')
-                val targetX = (tvSub.left + x + (tvSub.paint.measureText("i") / 2) - 10).toFloat() // Center dot
-                val targetY = (tvSub.top + baseline + ascent - 10).toFloat() // Above the 'i' stem
+                    val x = layout.getPrimaryHorizontal(iIndex)
+                    val line = layout.getLineForOffset(iIndex)
+                    val baseline = layout.getLineBaseline(line)
+                    val ascent = tvSub.paint.fontMetrics.ascent
 
-                // Initial position: bottom-left off-screen
-                dot.translationX = -200f
-                dot.translationY = root.height.toFloat() + 200f // From below
-                dot.visibility = View.VISIBLE
+                    // Position dot above 'ı', slightly lower
+                    val targetX = (tvSub.left + x + (tvSub.paint.measureText("ı") / 2) - 10).toFloat()
+                    val targetY = (tvSub.top + baseline + ascent - 10).toFloat() // Changed from -15 to -10
 
-                // Animate dot flying in
-                val animX = ObjectAnimator.ofFloat(dot, "translationX", -200f, targetX)
-                val animY = ObjectAnimator.ofFloat(dot, "translationY", root.height.toFloat() + 200f, targetY)
-                animX.duration = 1500
-                animY.duration = 1500
-                animX.interpolator = AccelerateDecelerateInterpolator()
-                animY.interpolator = AccelerateDecelerateInterpolator()
+                    dot.translationX = -200f
+                    dot.translationY = root.height.toFloat() + 200f
+                    dot.visibility = View.VISIBLE
 
-                val animatorSet = AnimatorSet()
-                animatorSet.playTogether(animX, animY)
-                animatorSet.start()
+                    val animX = ObjectAnimator.ofFloat(dot, "translationX", -200f, targetX)
+                    val animY = ObjectAnimator.ofFloat(dot, "translationY", root.height.toFloat() + 200f, targetY)
+                    animX.duration = 1500
+                    animY.duration = 1500
+                    animX.interpolator = AccelerateDecelerateInterpolator()
+                    animY.interpolator = AccelerateDecelerateInterpolator()
 
-                // Transition to MainActivity after 2 seconds (adjust as needed)
-                Handler(Looper.getMainLooper()).postDelayed({
-                    startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-                    finish()
-                }, 2000)
+                    val animatorSet = AnimatorSet()
+                    animatorSet.playTogether(animX, animY)
+                    animatorSet.start()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Animation error: ${e.message}")
+                } finally {
+                    proceedToMainActivity()
+                }
             }
         })
+    }
+
+    private fun proceedToMainActivity() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            try {
+                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                finish()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error starting MainActivity: ${e.message}")
+            }
+        }, 2000)
     }
 }
