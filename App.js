@@ -1,234 +1,3 @@
-// import React, {useEffect} from 'react';
-// import {PermissionsAndroid, Platform, Alert} from 'react-native';
-// import {GestureHandlerRootView} from 'react-native-gesture-handler';
-// import Routes from './src/routes/Routes';
-
-// const App = () => {
-//   useEffect(() => {
-//     const requestPermissions = async () => {
-//       if (Platform.OS === 'android') {
-//         try {
-//           const cameraStatus = await PermissionsAndroid.request(
-//             PermissionsAndroid.PERMISSIONS.CAMERA,
-//           );
-
-//           let storageStatus;
-//           if (Platform.Version >= 33) {
-//             storageStatus = await PermissionsAndroid.request(
-//               PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-//             );
-//           } else {
-//             storageStatus = await PermissionsAndroid.request(
-//               PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-//             );
-//           }
-
-//           if (
-//             cameraStatus !== PermissionsAndroid.RESULTS.GRANTED ||
-//             storageStatus !== PermissionsAndroid.RESULTS.GRANTED
-//           ) {
-//             Alert.alert(
-//               'Permission required',
-//               'Camera or storage permission was denied. Some features may not work properly.',
-//             );
-//           }
-//         } catch (error) {
-//           console.warn('Permission request error:', error);
-//         }
-//       }
-//     };
-
-//     requestPermissions();
-//   }, []);
-
-//   return (
-//     <GestureHandlerRootView style={{flex: 1}}>
-//       <Routes />
-//     </GestureHandlerRootView>
-//   );
-// };
-
-// export default App;
-
-// import React, {useEffect} from 'react';
-// import {PermissionsAndroid, Platform, Alert} from 'react-native';
-// import {GestureHandlerRootView} from 'react-native-gesture-handler';
-// import Routes from './src/routes/Routes';
-
-// const App = () => {
-//   useEffect(() => {
-//     const requestPermissions = async () => {
-//       if (Platform.OS === 'android') {
-//         try {
-//           // Request Camera
-//           const cameraStatus = await PermissionsAndroid.request(
-//             PermissionsAndroid.PERMISSIONS.CAMERA,
-//           );
-
-//           // Request Storage
-//           let storageStatus;
-//           if (Platform.Version >= 33) {
-//             storageStatus = await PermissionsAndroid.request(
-//               PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-//             );
-//           } else {
-//             storageStatus = await PermissionsAndroid.request(
-//               PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-//             );
-//           }
-
-//           // ✅ Request Notifications (Android 13+)
-//           let notificationStatus = 'granted';
-//           if (Platform.Version >= 33) {
-//             notificationStatus = await PermissionsAndroid.request(
-//               PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-//             );
-//           }
-
-//           // 🔍 Log results
-//           console.log('📷 Camera Permission:', cameraStatus);
-//           console.log('🗂 Storage Permission:', storageStatus);
-//           console.log('🔔 Notification Permission:', notificationStatus);
-
-//           // Check all permissions
-//           if (
-//             cameraStatus !== PermissionsAndroid.RESULTS.GRANTED ||
-//             storageStatus !== PermissionsAndroid.RESULTS.GRANTED ||
-//             notificationStatus !== PermissionsAndroid.RESULTS.GRANTED
-//           ) {
-//             Alert.alert(
-//               'Permission required',
-//               'Some permissions were denied. Features may not work properly.',
-//             );
-//           }
-//         } catch (error) {
-//           console.warn('Permission request error:', error);
-//         }
-//       }
-//     };
-
-//     requestPermissions();
-//   }, []);
-
-//   return (
-//     <GestureHandlerRootView style={{flex: 1}}>
-//       <Routes />
-//     </GestureHandlerRootView>
-//   );
-// };
-
-// export default App;
-
-// import React, {useEffect, useRef} from 'react';
-// import {PermissionsAndroid, Platform, Alert} from 'react-native';
-// import {GestureHandlerRootView} from 'react-native-gesture-handler';
-// import Routes from './src/routes/Routes';
-// import NotificationHandler from './src/components/NotificationHandler';
-// import Toast from 'react-native-toast-message';
-// import messaging from '@react-native-firebase/messaging';
-// import {useNavigation} from '@react-navigation/native';
-// import {useSelector} from 'react-redux';
-// import {
-//   requestNotificationPermission,
-//   getFcmToken,
-// } from './src/config/firebaseConfig';
-// import axios from 'axios';
-// import {BaseUrl} from './src/config/Urls';
-
-// // Updated FCM token update function
-// const updateFcmToken = async userToken => {
-//   console.log('user token in updateFcmToken', userToken);
-//   try {
-//     const hasPermission = await requestNotificationPermission();
-//     if (hasPermission) {
-//       const token = await getFcmToken();
-//       console.log('Token==>', token);
-//       if (token && userToken) {
-//         await axios.post(
-//           `${BaseUrl}/common/update-fcm-token`,
-//           {fcmToken: token},
-//           {
-//             headers: {
-//               Authorization: `Bearer ${userToken}`,
-//             },
-//           },
-//         );
-//         console.log('FCM token sent to backend');
-//       } else {
-//         console.warn('No FCM token or user token available');
-//       }
-//     }
-//   } catch (error) {
-//     console.error('Error updating FCM token:', error);
-//   }
-// };
-
-// const App = () => {
-//   const navigationRef = useRef(null);
-//   const userToken = useSelector(state => state.Auth.token);
-
-//   // console.log("User data in app.js",user);
-
-//   useEffect(() => {
-//     // Set up background notifications
-//     if (navigationRef.current) {
-//       setupBackgroundNotifications(navigationRef.current);
-//     }
-
-//     // Request permissions and update FCM token
-//     const requestPermissions = async () => {
-//       if (Platform.OS === 'android') {
-//         try {
-//           const cameraStatus = await PermissionsAndroid.request(
-//             PermissionsAndroid.PERMISSIONS.CAMERA,
-//           );
-//           let storageStatus;
-//           if (Platform.Version >= 33) {
-//             storageStatus = await PermissionsAndroid.request(
-//               PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-//             );
-//           } else {
-//             storageStatus = await PermissionsAndroid.request(
-//               PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-//             );
-//           }
-
-//           console.log('📷 Camera Permission:', cameraStatus);
-//           console.log('🗂 Storage Permission:', storageStatus);
-
-//           if (
-//             cameraStatus !== PermissionsAndroid.RESULTS.GRANTED ||
-//             storageStatus !== PermissionsAndroid.RESULTS.GRANTED
-//           ) {
-//             Alert.alert(
-//               'Permission required',
-//               'Some permissions were denied. Features may not work properly.',
-//             );
-//           }
-//         } catch (error) {
-//           console.warn('Permission request error:', error);
-//         }
-//       }
-//       // Update FCM token after permissions are handled
-//       if (userToken) {
-//         updateFcmToken(userToken);
-//       }
-//     };
-
-//     requestPermissions();
-//   }, [userToken]);
-
-//   return (
-//     <GestureHandlerRootView style={{flex: 1}}>
-//       <Routes />
-//       <NotificationHandler />
-//       <Toast position="top" />
-//     </GestureHandlerRootView>
-//   );
-// };
-
-// export default App;
-
 import React, {useEffect, useRef} from 'react';
 import {PermissionsAndroid, Platform, Alert} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -242,7 +11,41 @@ import {
 } from './src/config/firebaseConfig';
 import axios from 'axios';
 import {BaseUrl} from './src/config/Urls';
+import messaging from '@react-native-firebase/messaging';
+import notifee, {AndroidImportance} from '@notifee/react-native';
+const displayNotification = async remoteMessage => {
+  try {
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
+      importance: AndroidImportance.HIGH,
+    });
 
+    await notifee.displayNotification({
+      title: remoteMessage.data?.title || remoteMessage.notification?.title,
+      body: remoteMessage.data?.description || remoteMessage.notification?.body,
+      data: remoteMessage.data,
+      android: {
+        channelId,
+        smallIcon: 'ic_stat_ic_notification', // Match drawable resource
+        largeIcon: remoteMessage.data?.imageUri || null,
+        pressAction: {id: 'default'},
+        color: '#0C54A3',
+      },
+    });
+  } catch (e) {
+    console.error('Error displaying background notification:', e);
+  }
+};
+
+// Register Firebase background message handler
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+  console.log('Background Notification:', remoteMessage);
+  // Only display if no notification payload to avoid duplication
+  if (!remoteMessage.notification || !remoteMessage.notification.title) {
+    await displayNotification(remoteMessage);
+  }
+});
 // 🔹 Update FCM token to backend
 const updateFcmToken = async userToken => {
   console.log('user token in updateFcmToken', userToken);
@@ -315,7 +118,6 @@ const requestAppPermissions = async () => {
 };
 
 const App = () => {
-  const navigationRef = useRef(null);
   const userToken = useSelector(state => state.Auth.token);
 
   useEffect(() => {

@@ -66,11 +66,10 @@ export const Auth = createApi({
     }),
     updateProfile: builder.mutation({
       query: formData => ({
-        url: '/student/update-profile',
+        url: '/common/update-profile',
         method: 'PUT',
         body: formData,
       }),
-      invalidatesTags: ['User'],
     }),
     getLostFoundItems: builder.query({
       query: () => ({

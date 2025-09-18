@@ -121,7 +121,7 @@ const Dashboard = () => {
           day: 'numeric',
           year: 'numeric',
         }),
-        username: item.reportedBy?.name || 'Unknown',
+        username: item.reportedBy?.name || 'Admin',
         status: item.type.charAt(0).toUpperCase() + item.type.slice(1),
         category: item.category || 'Other',
       })) || [];

@@ -784,21 +784,6 @@ const CompleteProfile = () => {
   const navigation = useNavigation();
   const [completeProfile, {isLoading}] = useCompleteProfileMutation();
 
-  // const requestGalleryPermission = async () => {
-  //   if (Platform.OS === 'android') {
-  //     const granted = await PermissionsAndroid.request(
-  //       PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-  //       {
-  //         title: 'Gallery Permission',
-  //         message: 'App needs access to your photos',
-  //         buttonPositive: 'OK',
-  //       },
-  //     );
-  //     return granted === PermissionsAndroid.RESULTS.GRANTED;
-  //   }
-  //   return true;
-  // };
-
   const requestGalleryPermission = async () => {
     if (Platform.OS === 'android') {
       try {
@@ -892,9 +877,8 @@ const CompleteProfile = () => {
     try {
       const result = await completeProfile(formData).unwrap();
       console.log('Profile update result:', result);
-      dispatch(updateUserProfile(result.user)); // Save updated user data
+      dispatch(updateUserProfile(result.user));
       Toasts('Success', 'Profile Updated', 'success', 2000);
-      // navigation.reset({ index: 0, routes: [{ name: 'StackRoute' }] }); // Navigate to main app
     } catch (err) {
       Toasts('Error', err?.data?.message || 'Update failed', 'error', 2000);
     }
@@ -1072,11 +1056,12 @@ const CompleteProfile = () => {
             </View>
 
             <MyButton
-              text={isLoading ? '' : 'Submit'} // Hide text when loading
+              isLoading={isLoading}
+              text={'Submit'}
               backgroundColor={Colors.primary}
               textColor={Colors.white}
               onPress={handleSubmit}
-              disabled={isLoading} // Disable button during loading
+              disabled={isLoading}
               textstyle={{
                 fontSize: responsiveFontSize(2.5),
                 width: responsiveWidth(90),

@@ -49,7 +49,10 @@ const Login = () => {
         'success',
         3000,
       );
-      if (!result.isProfileComplete) {
+      if (
+        !result?.user?.isProfileComplete &&
+        result?.user?.role === 'student'
+      ) {
         navigation.navigate('CompleteProfile');
       }
     } catch (err) {
@@ -131,6 +134,7 @@ const Login = () => {
               </View>
               <View style={{marginTop: responsiveHeight(2)}}>
                 <MyButton
+                  isLoading={isLoading}
                   text="Sign In"
                   backgroundColor={Colors.primary}
                   textColor={Colors.white}
