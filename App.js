@@ -27,7 +27,7 @@ const displayNotification = async remoteMessage => {
       data: remoteMessage.data,
       android: {
         channelId,
-        smallIcon: 'ic_stat_ic_notification', // Match drawable resource
+        smallIcon: 'ic_stat_ic_notification',
         largeIcon: remoteMessage.data?.imageUri || null,
         pressAction: {id: 'default'},
         color: '#0C54A3',
@@ -38,15 +38,12 @@ const displayNotification = async remoteMessage => {
   }
 };
 
-// Register Firebase background message handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('Background Notification:', remoteMessage);
-  // Only display if no notification payload to avoid duplication
   if (!remoteMessage.notification || !remoteMessage.notification.title) {
     await displayNotification(remoteMessage);
   }
 });
-// 🔹 Update FCM token to backend
 const updateFcmToken = async userToken => {
   console.log('user token in updateFcmToken', userToken);
   try {
@@ -74,16 +71,13 @@ const updateFcmToken = async userToken => {
   }
 };
 
-// 🔹 Request Camera + Gallery + Notification permissions
 const requestAppPermissions = async () => {
   if (Platform.OS === 'android') {
     try {
-      // Camera
       const cameraStatus = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.CAMERA,
       );
 
-      // Gallery (depends on Android version)
       let galleryStatus;
       if (Platform.Version >= 33) {
         galleryStatus = await PermissionsAndroid.request(
@@ -112,7 +106,6 @@ const requestAppPermissions = async () => {
     }
   }
 
-  // 🔔 Notifications (Firebase)
   const notiStatus = await requestNotificationPermission();
   console.log('🔔 Notification Permission:', notiStatus);
 };
@@ -121,10 +114,10 @@ const App = () => {
   const userToken = useSelector(state => state.Auth.token);
 
   useEffect(() => {
-    // ✅ Ask all permissions on app start
     requestAppPermissions();
+  }, []);
 
-    // ✅ Update FCM token after permissions
+  useEffect(() => {
     if (userToken) {
       updateFcmToken(userToken);
     }

@@ -1196,7 +1196,7 @@ const ReportItem = () => {
 
               <MyTextInput
                 fieldName="Contact Information *"
-                placeholder="e.g., your phone number, email, or social handle"
+                placeholder="e.g., your number, email, or social handle"
                 value={contactInfo}
                 onChangeText={setContactInfo}
               />
@@ -1282,7 +1282,7 @@ const ReportItem = () => {
                       styles.modalButton,
                       {backgroundColor: Colors.lightGray},
                     ]}
-                    onPress={() => setImagePickerModalVisible(false)}>
+                    onPress={() => setImagePickerModalVisible(true)}>
                     <MyText text="Cancel" color={Colors.darkGray} />
                   </TouchableOpacity>
                 </View>

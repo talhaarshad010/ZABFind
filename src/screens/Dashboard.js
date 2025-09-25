@@ -147,7 +147,15 @@ const Dashboard = () => {
         style={{backgroundColor: Colors.white, elevation: 10}}
         leftView={
           <TouchableOpacity onPress={() => navigation.openDrawer()}>
-            <Icon name="person-circle-outline" size={30} color={Colors.black} />
+            {/* <Icon name="person-circle-outline" size={30} color={Colors.black} /> */}
+            <Image
+              style={{
+                height: responsiveHeight(5),
+                width: responsiveWidth(10),
+                borderRadius: responsiveWidth(5),
+              }}
+              source={{uri: user.profileImage}}
+            />
           </TouchableOpacity>
         }
         rightView={

@@ -263,7 +263,8 @@ const Messages = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: responsiveWidth(4),
+    width: '100%',
+    paddingHorizontal: responsiveWidth(2),
     backgroundColor: Colors.white,
   },
   header: {
@@ -277,11 +278,11 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   chatItem: {
-    backgroundColor: '#0C54A3',
+    backgroundColor: '#fff',
     borderRadius: 16,
     marginVertical: responsiveHeight(0.8),
     padding: responsiveHeight(1.5),
-    elevation: 3,
+    elevation: responsiveWidth(1),
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.15,

@@ -47,21 +47,15 @@ const Login = () => {
         'Login Successful',
         `Welcome back, ${result.user.fullName}!`,
         'success',
-        3000,
+        5000,
       );
-      if (
-        !result?.user?.isProfileComplete &&
-        result?.user?.role === 'student'
-      ) {
-        navigation.navigate('CompleteProfile');
-      }
     } catch (err) {
       const errorMessage =
         err?.data?.message || 'Something went wrong. Please try again.';
 
       console.log('Login failed:', err);
 
-      Toasts('Login Failed', errorMessage, 'error', 3000);
+      Toasts('Login Failed', errorMessage, 'error', 5000);
     }
   };
 
