@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, forwardRef} from 'react';
 import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
 import Colors from '../styles/Colors';
 import {
@@ -9,75 +9,88 @@ import {
 import Feather from 'react-native-vector-icons/Feather';
 import MyText from './textcomponent';
 
-const MyTextInput = ({
-  inputStyle = {},
-  textStyle = {},
-  placeholder,
-  onChangeText,
-  value,
-  placeholderTextColor = Colors.gray,
-  RightView = false,
-  LeftView = null,
-  multiline = false,
-  fieldName,
-  ...rest
-}) => {
-  const [isPasswordVisible, setPasswordVisible] = useState(false);
+// Use forwardRef to pass the ref to the TextInput
+const MyTextInput = forwardRef(
+  (
+    {
+      inputStyle = {},
+      textStyle = {},
+      placeholder,
+      onChangeText,
+      value,
+      placeholderTextColor = Colors.gray,
+      RightView = false,
+      LeftView = null,
+      multiline = false,
+      fieldName,
+      onSubmitEditing, // Add onSubmitEditing prop
+      error = false,
+      ...rest
+    },
+    ref, // Receive the forwarded ref
+  ) => {
+    const [isPasswordVisible, setPasswordVisible] = useState(false);
 
-  return (
-    <View>
-      {fieldName && (
-        <MyText
-          color={Colors.black}
-          fontWeight="500"
-          fontSize={responsiveFontSize(2.2)}
-          text={fieldName}
-          textStyle={styles.fieldName}
-        />
-      )}
-
-      <View
-        style={[
-          styles.inputContainer,
-          multiline && styles.multilineContainer,
-          inputStyle,
-        ]}>
-        <View
-          style={[styles.inputInner, multiline && {alignItems: 'flex-start'}]}>
-          {LeftView && <View>{LeftView}</View>}
-          <TextInput
-            allowFontScaling={false}
-            secureTextEntry={RightView && !isPasswordVisible}
-            cursorColor={Colors.black}
-            placeholder={placeholder}
-            onChangeText={onChangeText}
-            value={value}
-            placeholderTextColor={placeholderTextColor}
-            style={[
-              styles.textInput,
-              multiline && styles.textAreaStyle,
-              textStyle,
-            ]}
-            multiline={multiline}
-            {...rest}
+    return (
+      <View>
+        {fieldName && (
+          <MyText
+            color={Colors.black}
+            fontWeight="500"
+            fontSize={responsiveFontSize(2.2)}
+            text={fieldName}
+            textStyle={styles.fieldName}
           />
-        </View>
-
-        {RightView && !multiline && (
-          <TouchableOpacity
-            // style={{padding: responsiveWidth(2)}}
-            onPress={() => setPasswordVisible(!isPasswordVisible)}>
-            <Feather
-              name={isPasswordVisible ? 'eye' : 'eye-off'}
-              size={20}
-              color={Colors.black}
-            />
-          </TouchableOpacity>
         )}
+
+        <View
+          style={[
+            styles.inputContainer,
+            multiline && styles.multilineContainer,
+            error && {borderColor: Colors.errorBorder || '#FF4500'},
+            inputStyle,
+          ]}>
+          <View
+            style={[
+              styles.inputInner,
+              multiline && {alignItems: 'flex-start'},
+            ]}>
+            {LeftView && <View>{LeftView}</View>}
+            <TextInput
+              ref={ref} // Attach the ref to TextInput
+              allowFontScaling={false}
+              secureTextEntry={RightView && !isPasswordVisible}
+              cursorColor={Colors.black}
+              placeholder={placeholder}
+              onChangeText={onChangeText}
+              value={value}
+              placeholderTextColor={placeholderTextColor}
+              style={[
+                styles.textInput,
+                multiline && styles.textAreaStyle,
+                textStyle,
+              ]}
+              multiline={multiline}
+              onSubmitEditing={onSubmitEditing} // Handle Enter key press
+              {...rest}
+            />
+          </View>
+
+          {RightView && !multiline && (
+            <TouchableOpacity
+              onPress={() => setPasswordVisible(!isPasswordVisible)}>
+              <Feather
+                name={isPasswordVisible ? 'eye' : 'eye-off'}
+                size={20}
+                color={Colors.black}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  },
+);
 
 export default MyTextInput;
 
@@ -103,7 +116,6 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.black,
     fontSize: responsiveFontSize(1.7),
-    // backgroundColor: 'red',
   },
   fieldName: {
     fontWeight: '500',
@@ -121,8 +133,8 @@ const styles = StyleSheet.create({
   },
   textAreaStyle: {
     textAlignVertical: 'top',
-    paddingVertical: responsiveHeight(1), // add this
-    flex: 1, // replace height: 100%
+    paddingVertical: responsiveHeight(1),
+    flex: 1,
     fontSize: responsiveFontSize(1.7),
     color: Colors.black,
   },

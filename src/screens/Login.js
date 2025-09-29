@@ -6,9 +6,11 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  StatusBar, // import is optional now, just for safety
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
+import {useForm, Controller} from 'react-hook-form';
+import {yupResolver} from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 import MyText from '../components/textcomponent';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Colors from '../styles/Colors';
@@ -23,24 +25,54 @@ import {
 import MyButton from '../components/CustomButton';
 import {useNavigation} from '@react-navigation/native';
 import {useSignInMutation} from '../store/Api/Auth';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {setAuth} from '../store/slices/Auth';
 import ToastMessage from '../hooks/ToastMessage';
 
+// Validation schema using Yup
+const validationSchema = Yup.object().shape({
+  email: Yup.string()
+    .trim()
+    .required('Email Address is required')
+    .email('Please enter a valid email address'),
+  password: Yup.string()
+    .trim()
+    .required('Password is required')
+    .min(8, 'Password must be at least 8 characters'),
+  // Optionally, make "Remember me" required
+  rememberMe: Yup.boolean().oneOf([true], 'You must agree to remember me'),
+});
+
 const Login = () => {
-  const [rememberMe, setRememberMe] = useState(false);
-  const toggleRemember = () => setRememberMe(!rememberMe);
   const navigation = useNavigation();
-  const [signIn, {data, isLoading, error}] = useSignInMutation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [signIn, {isLoading}] = useSignInMutation();
   const dispatch = useDispatch();
   const {Toasts} = ToastMessage();
 
-  const handleLogin = async () => {
+  // Initialize useForm with Yup resolver
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+    reset,
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  });
+
+  const onSubmit = async data => {
     try {
-      const result = await signIn({emailAddress: email, password}).unwrap();
-      console.log('responce from login: ', result);
+      const payload = {
+        emailAddress: data.email.trim(),
+        password: data.password.trim(),
+      };
+
+      const result = await signIn(payload).unwrap();
+      console.log('Response from login:', result);
 
       await dispatch(setAuth({token: result.token, user: result.user}));
       Toasts(
@@ -49,12 +81,13 @@ const Login = () => {
         'success',
         5000,
       );
+
+      // Reset form
+      reset();
     } catch (err) {
       const errorMessage =
         err?.data?.message || 'Something went wrong. Please try again.';
-
       console.log('Login failed:', err);
-
       Toasts('Login Failed', errorMessage, 'error', 5000);
     }
   };
@@ -88,35 +121,88 @@ const Login = () => {
             </View>
 
             <View style={styles.InputBox}>
-              <MyTextInput
-                fieldName={'Email Address'}
-                placeholder={'your@email.com'}
-                value={email}
-                onChangeText={text => setEmail(text)}
+              <Controller
+                control={control}
+                name="email"
+                render={({field: {onChange, value}}) => (
+                  <MyTextInput
+                    fieldName={'Email Address'}
+                    placeholder={'your@email.com'}
+                    value={value}
+                    onChangeText={onChange}
+                    onSubmitEditing={() =>
+                      control._fields.password._f.ref.current?.focus()
+                    }
+                    returnKeyType="next"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    autoFocus={true}
+                    error={errors.email?.message}
+                  />
+                )}
               />
-              <MyTextInput
-                fieldName={'Password'}
-                placeholder={'Enter your password'}
-                RightView={true}
-                value={password}
-                onChangeText={text => setPassword(text)}
+
+              {errors.email && (
+                <MyText
+                  color={Colors.red}
+                  fontSize={responsiveFontSize(1.7)}
+                  text={errors.email.message}
+                  textStyle={{marginLeft: responsiveWidth(2)}}
+                />
+              )}
+
+              <Controller
+                control={control}
+                name="password"
+                render={({field: {onChange, value}}) => (
+                  <MyTextInput
+                    fieldName={'Password'}
+                    placeholder={'Enter your password'}
+                    RightView={true}
+                    value={value}
+                    onChangeText={onChange}
+                    onSubmitEditing={handleSubmit(onSubmit)}
+                    returnKeyType="done"
+                    secureTextEntry={true}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    error={errors.password?.message}
+                  />
+                )}
               />
+
+              {errors.password && (
+                <MyText
+                  color={Colors.red}
+                  fontSize={responsiveFontSize(1.7)}
+                  text={errors.password.message}
+                  textStyle={{marginLeft: responsiveWidth(2)}}
+                />
+              )}
 
               <View style={styles.RememberAndForget}>
                 <View style={{flexDirection: 'row', gap: responsiveWidth(2)}}>
-                  <TouchableOpacity
-                    style={styles.RememberBox}
-                    onPress={toggleRemember}>
-                    {rememberMe && (
-                      <Icon
-                        name="check"
-                        size={responsiveFontSize(2)}
-                        color={Colors.primary}
-                      />
+                  <Controller
+                    control={control}
+                    name="rememberMe"
+                    render={({field: {onChange, value}}) => (
+                      <TouchableOpacity
+                        style={styles.RememberBox}
+                        onPress={() => onChange(!value)}>
+                        {value && (
+                          <Icon
+                            name="check"
+                            size={responsiveFontSize(2)}
+                            color={Colors.primary}
+                          />
+                        )}
+                      </TouchableOpacity>
                     )}
-                  </TouchableOpacity>
+                  />
                   <MyText color={Colors.black} text={'Remember me'} />
                 </View>
+
                 <TouchableOpacity
                   onPress={() => navigation.navigate('ForgetPassword')}>
                   <MyText
@@ -126,41 +212,51 @@ const Login = () => {
                   />
                 </TouchableOpacity>
               </View>
-              <View style={{marginTop: responsiveHeight(2)}}>
-                <MyButton
-                  isLoading={isLoading}
-                  text="Sign In"
-                  backgroundColor={Colors.primary}
-                  textColor={Colors.white}
-                  fontWeight="50"
-                  textstyle={{
-                    fontSize: responsiveFontSize(3),
-                    width: responsiveWidth(90),
-                  }}
-                  onPress={handleLogin}
+              {/* Display error for rememberMe if required */}
+              {errors.rememberMe && (
+                <MyText
+                  color={Colors.red}
+                  fontSize={responsiveFontSize(1.7)}
+                  text={errors.rememberMe.message}
+                  textStyle={{marginLeft: responsiveWidth(2)}}
                 />
+              )}
+            </View>
 
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginTop: responsiveHeight(2),
-                    alignSelf: 'center',
+            <View>
+              <MyButton
+                isLoading={isLoading}
+                text="Sign In"
+                backgroundColor={Colors.primary}
+                textColor={Colors.white}
+                fontWeight="50"
+                textstyle={{
+                  fontSize: responsiveFontSize(3),
+                  width: responsiveWidth(90),
+                }}
+                onPress={handleSubmit(onSubmit)}
+              />
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: responsiveHeight(2),
+                  alignSelf: 'center',
+                }}>
+                <MyText
+                  fontSize={responsiveFontSize(1.7)}
+                  text={"Don't have an account? "}
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('SignUp');
                   }}>
                   <MyText
+                    color={Colors.primary}
                     fontSize={responsiveFontSize(1.7)}
-                    text={"Don't have an account? "}
+                    text={'Sign up '}
                   />
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate('SignUp');
-                    }}>
-                    <MyText
-                      color={Colors.primary}
-                      fontSize={responsiveFontSize(1.7)}
-                      text={'Sign up '}
-                    />
-                  </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
           </View>

@@ -226,12 +226,7 @@ const Messages = () => {
 
   return (
     <WrapperContainer>
-      <MyHeader
-        style={styles.header}
-        ScreenName="Messages"
-        leftView={<Icon name="arrow-left" size={24} color={Colors.black} />}
-        onPressleft={() => navigation.goBack()}
-      />
+      <MyHeader style={styles.header} ScreenName="Messages" leftView={false} />
       <View style={styles.container}>
         <FlatList
           data={chats}

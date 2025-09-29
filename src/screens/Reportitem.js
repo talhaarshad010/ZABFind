@@ -10,8 +10,9 @@
 //   Pressable,
 //   PermissionsAndroid,
 //   TextInput,
+//   FlatList,
 // } from 'react-native';
-// import React, {useState} from 'react';
+// import React, {useState, useRef} from 'react';
 // import MyHeader from '../components/Header';
 // import WrapperContainer from '../components/WrapperContainer';
 // import Colors from '../styles/Colors';
@@ -24,14 +25,13 @@
 //   responsiveFontSize,
 // } from 'react-native-responsive-dimensions';
 // import MyTextInput from '../components/TextInputComponent';
-// import TextInputDropdown from '../components/Dropdown';
 // import MyButton from '../components/CustomButton';
 // import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 // import {useNavigation} from '@react-navigation/native';
 // import ToastMessage from '../hooks/ToastMessage';
 // import {useAddReportMutation} from '../store/Api/addItemReport';
 
-// const Reportitem = () => {
+// const ReportItem = () => {
 //   const [selected, setSelected] = useState('lost');
 //   const [itemName, setItemName] = useState('');
 //   const [category, setCategory] = useState('');
@@ -40,13 +40,22 @@
 //   const [imageFile, setImageFile] = useState(null);
 //   const [location, setLocation] = useState('');
 //   const [contactInfo, setContactInfo] = useState('');
-//   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-//   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+//   const [dropdownModal, setDropdownModal] = useState({
+//     visible: false,
+//     field: '',
+//     options: [],
+//     title: '',
+//   });
 //   const [imagePickerModalVisible, setImagePickerModalVisible] = useState(false);
 //   const [isLoading, setIsLoading] = useState(false);
 //   const navigation = useNavigation();
 //   const {Toasts} = ToastMessage();
 //   const [addReport, {isLoading: isApiLoading}] = useAddReportMutation();
+
+//   // Create refs for input fields
+//   const itemNameInputRef = useRef(null);
+//   const descriptionInputRef = useRef(null);
+//   const contactInfoInputRef = useRef(null);
 
 //   const categoryOptions = [
 //     'Electronics',
@@ -82,12 +91,12 @@
 
 //   const resetForm = () => {
 //     setItemName('');
-//     setCategory(null);
+//     setCategory('');
 //     setDescription('');
 //     setSelected('lost');
 //     setImageUri(null);
 //     setImageFile(null);
-//     setLocation(null);
+//     setLocation('');
 //     setContactInfo('');
 //   };
 
@@ -190,10 +199,8 @@
 
 //     let permission;
 //     if (parseInt(Platform.Version, 10) >= 33) {
-//       // Android 13+: Use granular media permissions
 //       permission = PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES;
 //     } else {
-//       // Android 12 and below: Use legacy storage permission
 //       permission = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
 //     }
 
@@ -273,6 +280,21 @@
 //     );
 //   };
 
+//   const openDropdown = (field, options, title) => {
+//     setDropdownModal({visible: true, field, options, title});
+//   };
+
+//   const handleDropdownSelect = value => {
+//     if (dropdownModal.field === 'category') {
+//       setCategory(value);
+//       descriptionInputRef.current?.focus();
+//     } else if (dropdownModal.field === 'location') {
+//       setLocation(value);
+//       contactInfoInputRef.current?.focus();
+//     }
+//     setDropdownModal({visible: false, field: '', options: [], title: ''});
+//   };
+
 //   return (
 //     <WrapperContainer>
 //       <KeyboardAvoidingView
@@ -335,7 +357,10 @@
 //                     styles.card,
 //                     selected === 'lost' && styles.selectedCardLost,
 //                   ]}
-//                   onPress={() => setSelected('lost')}>
+//                   onPress={() => {
+//                     setSelected('lost');
+//                     itemNameInputRef.current?.focus();
+//                   }}>
 //                   <MyText
 //                     text="🙁"
 //                     fontSize={responsiveFontSize(4)}
@@ -364,7 +389,10 @@
 //                     styles.card,
 //                     selected === 'found' && styles.selectedCardFound,
 //                   ]}
-//                   onPress={() => setSelected('found')}>
+//                   onPress={() => {
+//                     setSelected('found');
+//                     itemNameInputRef.current?.focus();
+//                   }}>
 //                   <MyText
 //                     text="🎉"
 //                     fontSize={responsiveFontSize(4)}
@@ -390,10 +418,17 @@
 //               </View>
 
 //               <MyTextInput
+//                 ref={itemNameInputRef}
 //                 fieldName="Item Name *"
 //                 placeholder="e.g., iPhone 14, Blue Backpack, Car Keys"
 //                 value={itemName}
 //                 onChangeText={setItemName}
+//                 onSubmitEditing={() =>
+//                   openDropdown('category', categoryOptions, 'Select Category')
+//                 }
+//                 returnKeyType="next"
+//                 autoCapitalize="words"
+//                 autoCorrect={true}
 //               />
 
 //               <MyText
@@ -403,16 +438,18 @@
 //                 color={Colors.black}
 //                 textStyle={styles.fieldLabel}
 //               />
-//               <TextInputDropdown
-//                 defaultValue={category}
-//                 data={categoryOptions}
-//                 onSelect={setCategory}
-//                 isOpen={isCategoryDropdownOpen}
-//                 onToggle={() => {
-//                   setIsCategoryDropdownOpen(!isCategoryDropdownOpen);
-//                   setIsLocationDropdownOpen(false);
-//                 }}
-//               />
+//               <TouchableOpacity
+//                 style={styles.inputContainer}
+//                 onPress={() =>
+//                   openDropdown('category', categoryOptions, 'Select Category')
+//                 }>
+//                 <MyText
+//                   text={category || 'Select Category'}
+//                   fontSize={responsiveFontSize(1.9)}
+//                   color={category ? Colors.black : Colors.gray}
+//                 />
+//                 <Icon name="chevron-down" size={20} color={Colors.gray} />
+//               </TouchableOpacity>
 
 //               <MyText
 //                 text="Description *"
@@ -421,9 +458,9 @@
 //                 color={Colors.black}
 //                 textStyle={styles.fieldLabel}
 //               />
-
 //               <View style={styles.descriptionContainer}>
 //                 <TextInput
+//                   ref={descriptionInputRef}
 //                   placeholder="Provide a detailed description including color, brand, size, distinctive features, etc."
 //                   placeholderTextColor={Colors.gray}
 //                   value={description}
@@ -434,6 +471,12 @@
 //                   textAlignVertical="top"
 //                   allowFontScaling={false}
 //                   cursorColor={Colors.black}
+//                   onSubmitEditing={() =>
+//                     openDropdown('location', locationOptions, 'Select Location')
+//                   }
+//                   returnKeyType="next"
+//                   autoCapitalize="sentences"
+//                   autoCorrect={true}
 //                 />
 //               </View>
 
@@ -444,22 +487,30 @@
 //                 color={Colors.black}
 //                 textStyle={styles.fieldLabel}
 //               />
-//               <TextInputDropdown
-//                 defaultValue={location}
-//                 data={locationOptions}
-//                 onSelect={setLocation}
-//                 isOpen={isLocationDropdownOpen}
-//                 onToggle={() => {
-//                   setIsLocationDropdownOpen(!isLocationDropdownOpen);
-//                   setIsCategoryDropdownOpen(false);
-//                 }}
-//               />
+//               <TouchableOpacity
+//                 style={styles.inputContainer}
+//                 onPress={() =>
+//                   openDropdown('location', locationOptions, 'Select Location')
+//                 }>
+//                 <MyText
+//                   text={location || 'Select Location'}
+//                   fontSize={responsiveFontSize(1.9)}
+//                   color={location ? Colors.black : Colors.gray}
+//                 />
+//                 <Icon name="chevron-down" size={20} color={Colors.gray} />
+//               </TouchableOpacity>
 
 //               <MyTextInput
+//                 ref={contactInfoInputRef}
 //                 fieldName="Contact Information *"
-//                 placeholder="e.g., your phone number, email, or social handle"
+//                 placeholder="e.g., your number, email, or social handle"
 //                 value={contactInfo}
 //                 onChangeText={setContactInfo}
+//                 onSubmitEditing={handleSubmit}
+//                 returnKeyType="done"
+//                 keyboardType="email-address"
+//                 autoCapitalize="none"
+//                 autoCorrect={false}
 //               />
 
 //               <MyText
@@ -469,7 +520,6 @@
 //                 color={Colors.black}
 //                 textStyle={styles.fieldLabel}
 //               />
-
 //               <TouchableOpacity
 //                 onPress={() => setImagePickerModalVisible(true)}
 //                 style={styles.dottedBox}>
@@ -480,7 +530,6 @@
 //                     color={Colors.gray}
 //                     style={styles.uploadIcon}
 //                   />
-
 //                   <MyText
 //                     text="Click to upload"
 //                     fontSize={responsiveFontSize(2)}
@@ -488,14 +537,12 @@
 //                     color={Colors.black}
 //                     textStyle={{marginTop: responsiveHeight(1)}}
 //                   />
-
 //                   <MyText
 //                     text="PNG, JPG up to 10MB"
 //                     fontSize={responsiveFontSize(1.6)}
 //                     color={Colors.gray}
 //                     textStyle={{marginVertical: responsiveHeight(0.5)}}
 //                   />
-
 //                   <MyButton
 //                     text="Choose File"
 //                     onPress={() => setImagePickerModalVisible(true)}
@@ -516,7 +563,6 @@
 //                   onPress={() => setImagePickerModalVisible(false)}
 //                   style={styles.modalOverlay}
 //                 />
-
 //                 <View style={styles.modalContainer}>
 //                   <MyText
 //                     text="Upload Image"
@@ -525,7 +571,6 @@
 //                     color={Colors.black}
 //                     textStyle={{marginBottom: responsiveHeight(2)}}
 //                   />
-
 //                   <TouchableOpacity
 //                     style={styles.modalButton}
 //                     onPress={openCamera}>
@@ -535,7 +580,6 @@
 //                       fontWeight="500"
 //                     />
 //                   </TouchableOpacity>
-
 //                   <TouchableOpacity
 //                     style={styles.modalButton}
 //                     onPress={openGallery}>
@@ -545,7 +589,6 @@
 //                       fontWeight="500"
 //                     />
 //                   </TouchableOpacity>
-
 //                   <TouchableOpacity
 //                     style={[
 //                       styles.modalButton,
@@ -554,6 +597,90 @@
 //                     onPress={() => setImagePickerModalVisible(false)}>
 //                     <MyText text="Cancel" color={Colors.darkGray} />
 //                   </TouchableOpacity>
+//                 </View>
+//               </Modal>
+
+//               <Modal
+//                 transparent
+//                 animationType="fade"
+//                 visible={dropdownModal.visible}
+//                 onRequestClose={() =>
+//                   setDropdownModal({
+//                     visible: false,
+//                     field: '',
+//                     options: [],
+//                     title: '',
+//                   })
+//                 }>
+//                 <View style={styles.modalOverlay}>
+//                   <View style={styles.dropdownModal}>
+//                     <MyText
+//                       text={dropdownModal.title}
+//                       fontSize={responsiveFontSize(2.5)}
+//                       fontWeight="600"
+//                       color={Colors.black}
+//                       textStyle={{
+//                         marginBottom: responsiveHeight(2),
+//                         textAlign: 'center',
+//                       }}
+//                     />
+//                     <FlatList
+//                       data={dropdownModal.options}
+//                       keyExtractor={item => item}
+//                       showsVerticalScrollIndicator={false}
+//                       renderItem={({item}) => (
+//                         <TouchableOpacity
+//                           style={[
+//                             styles.dropdownItem,
+//                             (dropdownModal.field === 'category' &&
+//                               category === item) ||
+//                             (dropdownModal.field === 'location' &&
+//                               location === item)
+//                               ? {backgroundColor: Colors.primaryLight}
+//                               : {},
+//                           ]}
+//                           onPress={() => handleDropdownSelect(item)}>
+//                           <MyText
+//                             text={item}
+//                             fontSize={responsiveFontSize(2)}
+//                             color={
+//                               (dropdownModal.field === 'category' &&
+//                                 category === item) ||
+//                               (dropdownModal.field === 'location' &&
+//                                 location === item)
+//                                 ? Colors.primary
+//                                 : Colors.black
+//                             }
+//                             fontWeight={
+//                               (dropdownModal.field === 'category' &&
+//                                 category === item) ||
+//                               (dropdownModal.field === 'location' &&
+//                                 location === item)
+//                                 ? '600'
+//                                 : '500'
+//                             }
+//                           />
+//                         </TouchableOpacity>
+//                       )}
+//                       style={{maxHeight: responsiveHeight(30)}}
+//                     />
+//                     <TouchableOpacity
+//                       style={styles.modalButton}
+//                       onPress={() =>
+//                         setDropdownModal({
+//                           visible: false,
+//                           field: '',
+//                           options: [],
+//                           title: '',
+//                         })
+//                       }>
+//                       <MyText
+//                         text="Cancel"
+//                         color={Colors.darkGray}
+//                         fontSize={responsiveFontSize(2)}
+//                       />
+//                     </TouchableOpacity>
+//                   </View>
 //                 </View>
 //               </Modal>
 
@@ -681,6 +808,8 @@
 //   modalOverlay: {
 //     flex: 1,
 //     backgroundColor: 'rgba(0,0,0,0.5)',
+//     justifyContent: 'center',
+//     alignItems: 'center',
 //   },
 //   modalContainer: {
 //     position: 'absolute',
@@ -694,11 +823,11 @@
 //   },
 //   modalButton: {
 //     width: '100%',
-//     backgroundColor: Colors.lightGray,
+//     backgroundColor: '#f9f9f9',
 //     paddingVertical: responsiveHeight(1.5),
 //     borderRadius: responsiveWidth(3),
 //     alignItems: 'center',
-//     marginBottom: responsiveHeight(1.5),
+//     marginTop: responsiveHeight(1),
 //   },
 //   dottedBox: {
 //     borderWidth: 1.5,
@@ -715,9 +844,38 @@
 //     height: responsiveWidth(10),
 //     tintColor: Colors.gray,
 //   },
+//   inputContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     borderWidth: 1,
+//     borderColor: Colors.lightGray,
+//     borderRadius: responsiveWidth(2.5),
+//     paddingHorizontal: responsiveWidth(3),
+//     paddingVertical: responsiveHeight(1.5),
+//     marginBottom: responsiveHeight(1.5),
+//     backgroundColor: '#f9f9f9',
+//   },
+//   dropdownModal: {
+//     backgroundColor: Colors.white,
+//     borderRadius: responsiveWidth(3),
+//     padding: responsiveWidth(4),
+//     width: responsiveWidth(80),
+//     elevation: 5,
+//     shadowColor: '#000',
+//     shadowOffset: {width: 0, height: 2},
+//     shadowOpacity: 0.3,
+//     shadowRadius: 4,
+//   },
+//   dropdownItem: {
+//     paddingVertical: responsiveHeight(1.5),
+//     paddingHorizontal: responsiveWidth(3),
+//     borderBottomWidth: 1,
+//     borderBottomColor: Colors.lightGray,
+//   },
 // });
 
-// export default Reportitem;
+// export default ReportItem;
 
 import {
   Image,
@@ -732,8 +890,9 @@ import {
   PermissionsAndroid,
   TextInput,
   FlatList,
+  Keyboard,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import MyHeader from '../components/Header';
 import WrapperContainer from '../components/WrapperContainer';
 import Colors from '../styles/Colors';
@@ -772,6 +931,11 @@ const ReportItem = () => {
   const navigation = useNavigation();
   const {Toasts} = ToastMessage();
   const [addReport, {isLoading: isApiLoading}] = useAddReportMutation();
+
+  // Create refs for input fields
+  const itemNameInputRef = useRef(null);
+  const descriptionInputRef = useRef(null);
+  const contactInfoInputRef = useRef(null);
 
   const categoryOptions = [
     'Electronics',
@@ -814,6 +978,8 @@ const ReportItem = () => {
     setImageFile(null);
     setLocation('');
     setContactInfo('');
+    setDropdownModal({visible: false, field: '', options: [], title: ''});
+    setImagePickerModalVisible(false);
   };
 
   const handleSubmit = async () => {
@@ -869,10 +1035,8 @@ const ReportItem = () => {
         'success',
         4000,
       );
-      setTimeout(() => {
-        resetForm();
-        navigation.goBack();
-      }, 1000);
+      resetForm(); // Reset form immediately after successful submission
+      navigation.goBack();
     } catch (error) {
       let errorMessage = 'Failed to submit report. Please try again.';
 
@@ -943,6 +1107,7 @@ const ReportItem = () => {
       },
       response => {
         setImagePickerModalVisible(false);
+        Keyboard.dismiss(); // Dismiss keyboard to prevent focus issues
         if (
           !response.didCancel &&
           response.assets &&
@@ -976,6 +1141,7 @@ const ReportItem = () => {
       },
       response => {
         setImagePickerModalVisible(false);
+        Keyboard.dismiss(); // Dismiss keyboard to prevent focus issues
         if (
           !response.didCancel &&
           response.assets &&
@@ -997,14 +1163,17 @@ const ReportItem = () => {
   };
 
   const openDropdown = (field, options, title) => {
+    Keyboard.dismiss(); // Dismiss keyboard before opening dropdown
     setDropdownModal({visible: true, field, options, title});
   };
 
   const handleDropdownSelect = value => {
     if (dropdownModal.field === 'category') {
       setCategory(value);
+      descriptionInputRef.current?.focus();
     } else if (dropdownModal.field === 'location') {
       setLocation(value);
+      contactInfoInputRef.current?.focus();
     }
     setDropdownModal({visible: false, field: '', options: [], title: ''});
   };
@@ -1071,7 +1240,10 @@ const ReportItem = () => {
                     styles.card,
                     selected === 'lost' && styles.selectedCardLost,
                   ]}
-                  onPress={() => setSelected('lost')}>
+                  onPress={() => {
+                    setSelected('lost');
+                    itemNameInputRef.current?.focus();
+                  }}>
                   <MyText
                     text="🙁"
                     fontSize={responsiveFontSize(4)}
@@ -1100,7 +1272,10 @@ const ReportItem = () => {
                     styles.card,
                     selected === 'found' && styles.selectedCardFound,
                   ]}
-                  onPress={() => setSelected('found')}>
+                  onPress={() => {
+                    setSelected('found');
+                    itemNameInputRef.current?.focus();
+                  }}>
                   <MyText
                     text="🎉"
                     fontSize={responsiveFontSize(4)}
@@ -1126,10 +1301,17 @@ const ReportItem = () => {
               </View>
 
               <MyTextInput
+                ref={itemNameInputRef}
                 fieldName="Item Name *"
                 placeholder="e.g., iPhone 14, Blue Backpack, Car Keys"
                 value={itemName}
                 onChangeText={setItemName}
+                onSubmitEditing={() =>
+                  openDropdown('category', categoryOptions, 'Select Category')
+                }
+                returnKeyType="next"
+                autoCapitalize="words"
+                autoCorrect={true}
               />
 
               <MyText
@@ -1161,6 +1343,7 @@ const ReportItem = () => {
               />
               <View style={styles.descriptionContainer}>
                 <TextInput
+                  ref={descriptionInputRef}
                   placeholder="Provide a detailed description including color, brand, size, distinctive features, etc."
                   placeholderTextColor={Colors.gray}
                   value={description}
@@ -1171,6 +1354,12 @@ const ReportItem = () => {
                   textAlignVertical="top"
                   allowFontScaling={false}
                   cursorColor={Colors.black}
+                  onSubmitEditing={() =>
+                    openDropdown('location', locationOptions, 'Select Location')
+                  }
+                  returnKeyType="next"
+                  autoCapitalize="sentences"
+                  autoCorrect={true}
                 />
               </View>
 
@@ -1195,10 +1384,15 @@ const ReportItem = () => {
               </TouchableOpacity>
 
               <MyTextInput
+                ref={contactInfoInputRef}
                 fieldName="Contact Information *"
                 placeholder="e.g., your number, email, or social handle"
                 value={contactInfo}
                 onChangeText={setContactInfo}
+                returnKeyType="done"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
               />
 
               <MyText
@@ -1282,7 +1476,7 @@ const ReportItem = () => {
                       styles.modalButton,
                       {backgroundColor: Colors.lightGray},
                     ]}
-                    onPress={() => setImagePickerModalVisible(true)}>
+                    onPress={() => setImagePickerModalVisible(false)}>
                     <MyText text="Cancel" color={Colors.darkGray} />
                   </TouchableOpacity>
                 </View>
@@ -1315,6 +1509,7 @@ const ReportItem = () => {
                     <FlatList
                       data={dropdownModal.options}
                       keyExtractor={item => item}
+                      showsVerticalScrollIndicator={false}
                       renderItem={({item}) => (
                         <TouchableOpacity
                           style={[

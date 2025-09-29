@@ -106,7 +106,7 @@ class SplashActivity : Activity() {
 
                     // Position dot above 'ı', slightly lower
                     val targetX = (tvSub.left + x + (tvSub.paint.measureText("ı") / 2) - 10).toFloat()
-                    val targetY = (tvSub.top + baseline + ascent - 10).toFloat() // Changed from -15 to -10
+                    val targetY = (tvSub.top + baseline + ascent - 7).toFloat() // Changed from -15 to -10
 
                     dot.translationX = -200f
                     dot.translationY = root.height.toFloat() + 200f

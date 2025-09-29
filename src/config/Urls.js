@@ -1,6 +1,8 @@
 // export const BaseUrl = 'https://zab-find-backend.vercel.app/api';
 // export const BaseUrl = 'http://localhost:5000/api';
-// export const BaseUrl = 'http://192.168.18.14:5000/api';
+// export const BaseUrl = 'http://192.168.18.14:5000/api';  //Home IP
 // export const SocketUrl = 'http://192.168.18.14:5000';
-export const BaseUrl = 'http://192.168.0.117:5000/api'; //office IP
-export const SocketUrl = 'http://192.168.0.117:5000';
+// export const BaseUrl = 'http://192.168.0.117:5000/api'; //office IP
+// export const SocketUrl = 'http://192.168.0.117:5000';
+export const BaseUrl = 'https://zabfindbackend-production.up.railway.app/api';
+export const SocketUrl = 'https://zabfindbackend-production.up.railway.app/';

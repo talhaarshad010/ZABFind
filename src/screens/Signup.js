@@ -8,7 +8,10 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useRef} from 'react';
+import {useForm, Controller} from 'react-hook-form';
+import {yupResolver} from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 import MyText from '../components/textcomponent';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Colors from '../styles/Colors';
@@ -23,68 +26,399 @@ import {
 import MyButton from '../components/CustomButton';
 import {useNavigation} from '@react-navigation/native';
 import {useSignUpMutation} from '../store/Api/Auth';
-import {checkMinLength, validateEmail} from '../utils/validations';
 import ToastMessage from '../hooks/ToastMessage';
 
+// Validation schema using Yup
+const validationSchema = Yup.object().shape({
+  fullName: Yup.string()
+    .trim()
+    .required('Full Name is required')
+    .min(2, 'Full Name must be at least 2 characters'),
+  email: Yup.string()
+    .trim()
+    .required('Email Address is required')
+    .email('Please enter a valid email address'),
+  studentId: Yup.string()
+    .trim()
+    .required('Student ID is required')
+    .min(4, 'Student ID must be at least 4 characters'),
+  password: Yup.string()
+    .trim()
+    .required('Password is required')
+    .min(8, 'Password must be at least 8 characters'),
+  confirmPassword: Yup.string()
+    .trim()
+    .required('Confirm Password is required')
+    .oneOf([Yup.ref('password'), null], 'Passwords must match'),
+  agreeToTerms: Yup.boolean().oneOf(
+    [true],
+    'You must agree to the Terms of Service and Privacy Policy',
+  ),
+});
+
+// const Signup = () => {
+//   const navigation = useNavigation();
+//   const {Toasts} = ToastMessage();
+//   const [signUp, {isLoading}] = useSignUpMutation();
+
+//   // Create refs for each input
+//   const fullNameRef = useRef(null);
+//   const emailRef = useRef(null);
+//   const studentIdRef = useRef(null);
+//   const passwordRef = useRef(null);
+//   const confirmPasswordRef = useRef(null);
+
+//   // Initialize useForm with Yup resolver
+//   const {
+//     control,
+//     handleSubmit,
+//     formState: {errors},
+//     reset,
+//   } = useForm({
+//     resolver: yupResolver(validationSchema),
+//     defaultValues: {
+//       fullName: '',
+//       email: '',
+//       studentId: '',
+//       password: '',
+//       confirmPassword: '',
+//       agreeToTerms: false,
+//     },
+//   });
+
+//   const onSubmit = async data => {
+//     try {
+//       const payload = {
+//         fullName: data.fullName.trim(),
+//         emailAddress: data.email.trim(),
+//         studentId: data.studentId.trim(),
+//         password: data.password.trim(),
+//         confirmPassword: data.confirmPassword.trim(),
+//       };
+
+//       console.log('Signup payload:', payload);
+
+//       const res = await signUp(payload).unwrap();
+
+//       Toasts('Success', 'User Created Successfully', 'success', 2000);
+
+//       // Reset form
+//       reset();
+
+//       navigation.navigate('LogIn');
+//     } catch (error) {
+//       console.log('Signup error:', error);
+//       Toasts(
+//         'Error',
+//         error?.data?.message || 'Something went wrong!',
+//         'error',
+//         2000,
+//       );
+//     }
+//   };
+
+//   return (
+//     <WrapperContainer>
+//       <KeyboardAvoidingView
+//         style={{flex: 1}}
+//         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+//         <ScrollView
+//           contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}
+//           keyboardShouldPersistTaps="handled">
+//           <View style={styles.container}>
+//             <View style={{marginTop: responsiveHeight(4)}}>
+//               <AuthHeader />
+//               <View style={{marginVertical: responsiveHeight(4)}}>
+//                 <MyText
+//                   textStyle={{textAlign: 'center'}}
+//                   fontSize={responsiveFontSize(3.5)}
+//                   fontWeight={'500'}
+//                   color={Colors.black}
+//                   text={'CREATE ACCOUNT'}
+//                 />
+//                 <MyText
+//                   textStyle={{textAlign: 'center'}}
+//                   fontSize={responsiveFontSize(2)}
+//                   color={Colors.gray}
+//                   text={'Join the SZABIST LOST & Found community'}
+//                 />
+//               </View>
+//             </View>
+
+//             <View style={styles.InputBox}>
+//               <Controller
+//                 control={control}
+//                 name="fullName"
+//                 render={({field}) => (
+//                   <MyTextInput
+//                     ref={el => {
+//                       fullNameRef.current = el;
+//                       field.ref(el);
+//                     }}
+//                     fieldName={'Full Name'}
+//                     placeholder={'Enter your full name'}
+//                     value={field.value}
+//                     onChangeText={field.onChange}
+//                     onSubmitEditing={() => emailRef.current?.focus()}
+//                     returnKeyType="next"
+//                     autoCapitalize="words"
+//                     autoCorrect={true}
+//                     autoFocus={true}
+//                   />
+//                 )}
+//               />
+//               {errors.fullName && (
+//                 <MyText
+//                   color={Colors.red}
+//                   fontSize={responsiveFontSize(1.7)}
+//                   text={errors.fullName.message}
+//                   textStyle={{marginLeft: responsiveWidth(2)}}
+//                 />
+//               )}
+
+//               <Controller
+//                 control={control}
+//                 name="email"
+//                 render={({field}) => (
+//                   <MyTextInput
+//                     ref={el => {
+//                       emailRef.current = el;
+//                       field.ref(el);
+//                     }}
+//                     fieldName={'Email Address'}
+//                     placeholder={'Your@email.com'}
+//                     value={field.value}
+//                     onChangeText={field.onChange}
+//                     onSubmitEditing={() => studentIdRef.current?.focus()}
+//                     returnKeyType="next"
+//                     keyboardType="email-address"
+//                     autoCapitalize="none"
+//                     autoCorrect={false}
+//                   />
+//                 )}
+//               />
+//               {errors.email && (
+//                 <MyText
+//                   color={Colors.red}
+//                   fontSize={responsiveFontSize(1.7)}
+//                   text={errors.email.message}
+//                   textStyle={{marginLeft: responsiveWidth(2)}}
+//                 />
+//               )}
+
+//               <Controller
+//                 control={control}
+//                 name="studentId"
+//                 render={({field}) => (
+//                   <MyTextInput
+//                     ref={el => {
+//                       studentIdRef.current = el;
+//                       field.ref(el);
+//                     }}
+//                     fieldName={'Student ID'}
+//                     placeholder={'Enter your student ID'}
+//                     value={field.value}
+//                     onChangeText={field.onChange}
+//                     onSubmitEditing={() => passwordRef.current?.focus()}
+//                     returnKeyType="next"
+//                     keyboardType="default"
+//                     autoCapitalize="characters"
+//                     autoCorrect={false}
+//                   />
+//                 )}
+//               />
+//               {errors.studentId && (
+//                 <MyText
+//                   color={Colors.red}
+//                   fontSize={responsiveFontSize(1.7)}
+//                   text={errors.studentId.message}
+//                   textStyle={{marginLeft: responsiveWidth(2)}}
+//                 />
+//               )}
+
+//               <Controller
+//                 control={control}
+//                 name="password"
+//                 render={({field}) => (
+//                   <MyTextInput
+//                     ref={el => {
+//                       passwordRef.current = el;
+//                       field.ref(el);
+//                     }}
+//                     fieldName={'Password'}
+//                     placeholder={'Enter your password'}
+//                     RightView={true}
+//                     value={field.value}
+//                     onChangeText={field.onChange}
+//                     onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+//                     returnKeyType="next"
+//                     secureTextEntry={true}
+//                     autoCapitalize="none"
+//                     autoCorrect={false}
+//                   />
+//                 )}
+//               />
+//               {errors.password && (
+//                 <MyText
+//                   color={Colors.red}
+//                   fontSize={responsiveFontSize(1.7)}
+//                   text={errors.password.message}
+//                   textStyle={{marginLeft: responsiveWidth(2)}}
+//                 />
+//               )}
+
+//               <Controller
+//                 control={control}
+//                 name="confirmPassword"
+//                 render={({field}) => (
+//                   <MyTextInput
+//                     ref={el => {
+//                       confirmPasswordRef.current = el;
+//                       field.ref(el);
+//                     }}
+//                     fieldName={'Confirm Password'}
+//                     placeholder={'Enter your confirm password'}
+//                     RightView={true}
+//                     value={field.value}
+//                     onChangeText={field.onChange}
+//                     onSubmitEditing={handleSubmit(onSubmit)}
+//                     returnKeyType="done"
+//                     secureTextEntry={true}
+//                     autoCapitalize="none"
+//                     autoCorrect={false}
+//                   />
+//                 )}
+//               />
+//               {errors.confirmPassword && (
+//                 <MyText
+//                   color={Colors.red}
+//                   fontSize={responsiveFontSize(1.7)}
+//                   text={errors.confirmPassword.message}
+//                   textStyle={{marginLeft: responsiveWidth(2)}}
+//                 />
+//               )}
+
+//               <Controller
+//                 control={control}
+//                 name="agreeToTerms"
+//                 render={({field: {onChange, value}}) => (
+//                   <View style={styles.RememberAndForget}>
+//                     <TouchableOpacity
+//                       style={styles.RememberBox}
+//                       onPress={() => onChange(!value)}>
+//                       {value && (
+//                         <Icon
+//                           name="check"
+//                           size={responsiveFontSize(2)}
+//                           color={Colors.primary}
+//                         />
+//                       )}
+//                     </TouchableOpacity>
+//                     <MyText fontSize={responsiveFontSize(1.7)}>
+//                       <Text style={{color: Colors.black}}>I agree to the</Text>
+//                       <Text
+//                         style={{
+//                           color: Colors.primary,
+//                         }}>{` Terms of Service `}</Text>
+//                       <Text style={{color: Colors.black}}>and</Text>
+//                       <Text
+//                         style={{
+//                           color: Colors.primary,
+//                         }}>{` Privacy Policy `}</Text>
+//                     </MyText>
+//                   </View>
+//                 )}
+//               />
+//               {errors.agreeToTerms && (
+//                 <MyText
+//                   color={Colors.red}
+//                   fontSize={responsiveFontSize(1.7)}
+//                   text={errors.agreeToTerms.message}
+//                   textStyle={{marginLeft: responsiveWidth(2)}}
+//                 />
+//               )}
+//             </View>
+
+//             <View>
+//               <MyButton
+//                 style={{width: responsiveWidth(90)}}
+//                 isLoading={isLoading}
+//                 text="Sign Up"
+//                 backgroundColor={Colors.primary}
+//                 textColor={Colors.white}
+//                 fontWeight="50"
+//                 textstyle={{
+//                   fontSize: responsiveFontSize(3),
+//                 }}
+//                 onPress={handleSubmit(onSubmit)}
+//               />
+//               <View
+//                 style={{
+//                   flexDirection: 'row',
+//                   marginTop: responsiveHeight(2),
+//                   alignSelf: 'center',
+//                 }}>
+//                 <MyText
+//                   fontSize={responsiveFontSize(1.7)}
+//                   text={'Already have an account? '}
+//                 />
+//                 <TouchableOpacity
+//                   onPress={() => {
+//                     navigation.navigate('LogIn');
+//                   }}>
+//                   <MyText
+//                     color={Colors.primary}
+//                     fontSize={responsiveFontSize(1.7)}
+//                     text={'Sign In '}
+//                   />
+//                 </TouchableOpacity>
+//               </View>
+//             </View>
+//           </View>
+//         </ScrollView>
+//       </KeyboardAvoidingView>
+//     </WrapperContainer>
+//   );
+// };
+
 const Signup = () => {
-  const [rememberMe, setRememberMe] = useState(false);
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [studentId, setStudentId] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const toggleRemember = () => setRememberMe(!rememberMe);
   const navigation = useNavigation();
   const {Toasts} = ToastMessage();
-  // const [signUp] = useSignUpMutation();
-
   const [signUp, {isLoading}] = useSignUpMutation();
-  const handleSignup = async () => {
+
+  // Create refs for each input
+  const fullNameRef = useRef(null);
+  const emailRef = useRef(null);
+  const studentIdRef = useRef(null);
+  const passwordRef = useRef(null);
+  const confirmPasswordRef = useRef(null);
+
+  // Initialize useForm with Yup resolver
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+    reset,
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      fullName: '',
+      email: '',
+      studentId: '',
+      password: '',
+      confirmPassword: '',
+      agreeToTerms: false,
+    },
+  });
+
+  const onSubmit = async data => {
     try {
-      const trimmedFullName = fullName.trim();
-      const trimmedEmail = email.trim();
-      const trimmedStudentId = studentId.trim();
-      const trimmedPassword = password.trim();
-      const trimmedConfirmPassword = confirmPassword.trim();
-
-      if (
-        !trimmedFullName ||
-        !trimmedEmail ||
-        !trimmedStudentId ||
-        !trimmedPassword ||
-        !trimmedConfirmPassword
-      ) {
-        return Toasts('Error', 'Please fill all fields', 'error', 2000);
-      }
-
-      if (trimmedPassword !== trimmedConfirmPassword) {
-        return Toasts('Error', 'Passwords do not match', 'error', 2000);
-      }
-
-      if (!validateEmail(trimmedEmail)) {
-        return Toasts(
-          'Error',
-          'Please enter a valid email address',
-          'error',
-          2000,
-        );
-      }
-
-      if (checkMinLength(trimmedPassword, 8, 'Password')) {
-        return Toasts(
-          'Error',
-          'Password must be at least 8 characters long',
-          'error',
-          2000,
-        );
-      }
-
       const payload = {
-        fullName: trimmedFullName,
-        emailAddress: trimmedEmail,
-        studentId: trimmedStudentId,
-        password: trimmedPassword,
-        confirmPassword: trimmedConfirmPassword,
+        fullName: data.fullName.trim(),
+        emailAddress: data.email.trim(),
+        studentId: data.studentId.trim(),
+        password: data.password.trim(),
+        confirmPassword: data.confirmPassword.trim(),
       };
 
       console.log('Signup payload:', payload);
@@ -94,12 +428,7 @@ const Signup = () => {
       Toasts('Success', 'User Created Successfully', 'success', 2000);
 
       // Reset form
-      setFullName('');
-      setEmail('');
-      setStudentId('');
-      setPassword('');
-      setConfirmPassword('');
-      setRememberMe(false);
+      reset();
 
       navigation.navigate('LogIn');
     } catch (error) {
@@ -142,70 +471,202 @@ const Signup = () => {
             </View>
 
             <View style={styles.InputBox}>
-              <MyTextInput
-                fieldName={'Full Name'}
-                placeholder={'Enter your full name'}
-                value={fullName}
-                onChangeText={text => {
-                  setFullName(text);
-                }}
+              <Controller
+                control={control}
+                name="fullName"
+                render={({field}) => (
+                  <MyTextInput
+                    ref={el => {
+                      fullNameRef.current = el;
+                      field.ref(el);
+                    }}
+                    fieldName={'Full Name'}
+                    placeholder={'Enter your full name'}
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    onSubmitEditing={() => emailRef.current?.focus()}
+                    returnKeyType="next"
+                    autoCapitalize="words"
+                    autoCorrect={true}
+                    autoFocus={true}
+                    error={!!errors.fullName} // Pass error prop
+                  />
+                )}
               />
+              {errors.fullName && (
+                <MyText
+                  color={Colors.red}
+                  fontSize={responsiveFontSize(1.7)}
+                  text={errors.fullName.message}
+                  textStyle={{marginLeft: responsiveWidth(2)}}
+                />
+              )}
 
-              <MyTextInput
-                fieldName={'Email Address'}
-                placeholder={'Your@email.com'}
-                value={email}
-                onChangeText={text => setEmail(text)}
+              <Controller
+                control={control}
+                name="email"
+                render={({field}) => (
+                  <MyTextInput
+                    ref={el => {
+                      emailRef.current = el;
+                      field.ref(el);
+                    }}
+                    fieldName={'Email Address'}
+                    placeholder={'Your@email.com'}
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    onSubmitEditing={() => studentIdRef.current?.focus()}
+                    returnKeyType="next"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    error={!!errors.email} // Pass error prop
+                  />
+                )}
               />
+              {errors.email && (
+                <MyText
+                  color={Colors.red}
+                  fontSize={responsiveFontSize(1.7)}
+                  text={errors.email.message}
+                  textStyle={{marginLeft: responsiveWidth(2)}}
+                />
+              )}
 
-              <MyTextInput
-                fieldName={'Student ID'}
-                placeholder={'Enter your student ID'}
-                value={studentId}
-                onChangeText={text => setStudentId(text)}
+              <Controller
+                control={control}
+                name="studentId"
+                render={({field}) => (
+                  <MyTextInput
+                    ref={el => {
+                      studentIdRef.current = el;
+                      field.ref(el);
+                    }}
+                    fieldName={'Student ID'}
+                    placeholder={'Enter your student ID'}
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    onSubmitEditing={() => passwordRef.current?.focus()}
+                    returnKeyType="next"
+                    keyboardType="default"
+                    autoCapitalize="characters"
+                    autoCorrect={false}
+                    error={!!errors.studentId} // Pass error prop
+                  />
+                )}
               />
+              {errors.studentId && (
+                <MyText
+                  color={Colors.red}
+                  fontSize={responsiveFontSize(1.7)}
+                  text={errors.studentId.message}
+                  textStyle={{marginLeft: responsiveWidth(2)}}
+                />
+              )}
 
-              <MyTextInput
-                fieldName={'Password'}
-                placeholder={'Enter your password'}
-                RightView={true}
-                value={password}
-                onChangeText={text => setPassword(text)}
+              <Controller
+                control={control}
+                name="password"
+                render={({field}) => (
+                  <MyTextInput
+                    ref={el => {
+                      passwordRef.current = el;
+                      field.ref(el);
+                    }}
+                    fieldName={'Password'}
+                    placeholder={'Enter your password'}
+                    RightView={true}
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+                    returnKeyType="next"
+                    secureTextEntry={true}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    error={!!errors.password} // Pass error prop
+                  />
+                )}
               />
+              {errors.password && (
+                <MyText
+                  color={Colors.red}
+                  fontSize={responsiveFontSize(1.7)}
+                  text={errors.password.message}
+                  textStyle={{marginLeft: responsiveWidth(2)}}
+                />
+              )}
 
-              <MyTextInput
-                fieldName={'Confirm Password'}
-                placeholder={'Enter your confirm password'}
-                RightView={true}
-                value={confirmPassword}
-                onChangeText={text => {
-                  setConfirmPassword(text);
-                }}
+              <Controller
+                control={control}
+                name="confirmPassword"
+                render={({field}) => (
+                  <MyTextInput
+                    ref={el => {
+                      confirmPasswordRef.current = el;
+                      field.ref(el);
+                    }}
+                    fieldName={'Confirm Password'}
+                    placeholder={'Enter your confirm password'}
+                    RightView={true}
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    onSubmitEditing={handleSubmit(onSubmit)}
+                    returnKeyType="done"
+                    secureTextEntry={true}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    error={!!errors.confirmPassword} // Pass error prop
+                  />
+                )}
               />
+              {errors.confirmPassword && (
+                <MyText
+                  color={Colors.red}
+                  fontSize={responsiveFontSize(1.7)}
+                  text={errors.confirmPassword.message}
+                  textStyle={{marginLeft: responsiveWidth(2)}}
+                />
+              )}
 
-              <View style={styles.RememberAndForget}>
-                <TouchableOpacity
-                  style={styles.RememberBox}
-                  onPress={toggleRemember}>
-                  {rememberMe && (
-                    <Icon
-                      name="check"
-                      size={responsiveFontSize(2)}
-                      color={Colors.primary}
-                    />
-                  )}
-                </TouchableOpacity>
-                <MyText fontSize={responsiveFontSize(1.7)}>
-                  <Text style={{color: Colors.black}}>I agree to the</Text>
-                  <Text
-                    style={{
-                      color: Colors.primary,
-                    }}>{` Terms of Service `}</Text>
-                  <Text style={{color: Colors.black}}>and</Text>
-                  <Text
-                    style={{color: Colors.primary}}>{` Privacy Policy `}</Text>
-                </MyText>
-              </View>
+              <Controller
+                control={control}
+                name="agreeToTerms"
+                render={({field: {onChange, value}}) => (
+                  <View style={styles.RememberAndForget}>
+                    <TouchableOpacity
+                      style={styles.RememberBox}
+                      onPress={() => onChange(!value)}>
+                      {value && (
+                        <Icon
+                          name="check"
+                          size={responsiveFontSize(2)}
+                          color={Colors.primary}
+                        />
+                      )}
+                    </TouchableOpacity>
+                    <MyText fontSize={responsiveFontSize(1.7)}>
+                      <Text style={{color: Colors.black}}>I agree to the</Text>
+                      <Text
+                        style={{
+                          color: Colors.primary,
+                        }}>{` Terms of Service `}</Text>
+                      <Text style={{color: Colors.black}}>and</Text>
+                      <Text
+                        style={{
+                          color: Colors.primary,
+                        }}>{` Privacy Policy `}</Text>
+                    </MyText>
+                  </View>
+                )}
+              />
+              {errors.agreeToTerms && (
+                <MyText
+                  color={Colors.red}
+                  fontSize={responsiveFontSize(1.7)}
+                  text={errors.agreeToTerms.message}
+                  textStyle={{marginLeft: responsiveWidth(2)}}
+                />
+              )}
             </View>
 
             <View>
@@ -218,9 +679,8 @@ const Signup = () => {
                 fontWeight="50"
                 textstyle={{
                   fontSize: responsiveFontSize(3),
-                  // width: responsiveWidth(90),
                 }}
-                onPress={handleSignup}
+                onPress={handleSubmit(onSubmit)}
               />
               <View
                 style={{
