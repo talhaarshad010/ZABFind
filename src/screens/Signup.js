@@ -7,8 +7,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Keyboard,
 } from 'react-native';
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useForm, Controller} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
@@ -393,6 +394,10 @@ const Signup = () => {
   const passwordRef = useRef(null);
   const confirmPasswordRef = useRef(null);
 
+  useEffect(() => {
+    Keyboard.dismiss(); // Dismiss the keyboard when the screen mounts
+  }, []);
+
   // Initialize useForm with Yup resolver
   const {
     control,
@@ -488,7 +493,7 @@ const Signup = () => {
                     returnKeyType="next"
                     autoCapitalize="words"
                     autoCorrect={true}
-                    autoFocus={true}
+                    autoFocus={false}
                     error={!!errors.fullName} // Pass error prop
                   />
                 )}
